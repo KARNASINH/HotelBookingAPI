@@ -15,7 +15,7 @@ namespace HotelBookingAPI.Connection
         }
 
         //Getting connection string from the appsettings.json file and establishing connection with SQL Database.
-        public SqlConnection CreateConnection() => new SqlConnection(_configuration.GetConnectionString("DefaultConnection");           
+        public SqlConnection CreateConnection() => new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));           
        
     }
 }
