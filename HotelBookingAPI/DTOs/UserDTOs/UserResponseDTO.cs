@@ -4,7 +4,7 @@
     public class UserResponseDTO
     {
         //User Id
-        public string UserId { get; set; }
+        public int UserID { get; set; }
 
         //User Email Address
         public string Email { get; set; }

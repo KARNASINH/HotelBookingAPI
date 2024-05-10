@@ -3,6 +3,7 @@ using HotelBookingAPI.DTOs.UserDTOs;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Data;
+using System.Reflection.Metadata.Ecma335;
 
 namespace HotelBookingAPI.Repository
 {
@@ -17,6 +18,8 @@ namespace HotelBookingAPI.Repository
         {
             _connectionFactory = connectionFactory;
         }
+
+
 
         //This method is used to add a new user to the database
         public async Task<CreateUserResponseDTO> AddUserAsync(CreateUserDTO user)
@@ -84,6 +87,8 @@ namespace HotelBookingAPI.Repository
             return createUserResponseDTO;
         }
 
+
+
         //This method is used to assign a role to a user
         public async  Task<UserRoleResponseDTO> AssignRoleToUserAsync(UserRoleDTO userRole)
         {
@@ -94,7 +99,7 @@ namespace HotelBookingAPI.Repository
             using var connection = _connectionFactory.CreateConnection();
 
             //Create a command to execute the stored procedure spAssignRoleToUser
-            using var command = new SqlCommand("spAssignRoleToUser", connection)
+            using var command = new SqlCommand("spAssignUserRole", connection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -141,5 +146,51 @@ namespace HotelBookingAPI.Repository
                 return userRoleResponseDTO;
             }
         }
+
+
+
+        //This method is used to list all the users from the database
+        public async Task<List<UserResponseDTO>> ListAllUsersAsync(bool? isActive)
+        {
+            //Create a connection to the database using the SqlConnectionFactory
+            using var connection = _connectionFactory.CreateConnection();
+        
+            //Create a command to execute the stored procedure spListAllUsers
+            using var command = new SqlCommand("spListAllUsers", connection)
+            {
+                //Set the command type to stored procedure
+                CommandType = CommandType.StoredProcedure
+            };
+
+            //Add a parameter to the command
+            command.Parameters.AddWithValue("@IsActive", (object)isActive ?? DBNull.Value);
+            
+            //Open the connection
+            await connection.OpenAsync();
+
+            //Execute the command and get the data from the database
+            using var reader = await command.ExecuteReaderAsync();
+
+            //Create a list of UserResponseDTO
+            var users = new List<UserResponseDTO>();
+
+            //Read the data from the reader and add it to the list of users
+            while (reader.Read())
+            {
+                //Create an instance of UserResponseDTO
+                users.Add(new UserResponseDTO
+                {
+                    //Set the properties of the UserResponseDTO
+                    UserID = reader.GetInt32("UserID"),
+                    Email = reader.GetString("Email"),
+                    IsActive = reader.GetBoolean("IsActive")
+                });
+            }
+
+            //Return the list of users
+            return users;
+        }
+
+
     }
 }
