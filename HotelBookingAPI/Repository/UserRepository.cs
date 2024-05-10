@@ -89,6 +89,7 @@ namespace HotelBookingAPI.Repository
 
 
 
+
         //This method is used to assign a role to a user
         public async  Task<UserRoleResponseDTO> AssignRoleToUserAsync(UserRoleDTO userRole)
         {
@@ -146,6 +147,7 @@ namespace HotelBookingAPI.Repository
                 return userRoleResponseDTO;
             }
         }
+
 
 
 
@@ -243,6 +245,73 @@ namespace HotelBookingAPI.Repository
 
             //Return the User with data
             return user;
+        }
+
+
+
+
+
+        //This method is used to update the user details
+        public async Task<UpdateUserResponseDTO> UpdateUserAsync(UpdateUserDTO user)
+        {
+            //Create an instance of UpdateUserResponseDTO
+            UpdateUserResponseDTO updateUserResponseDTO = new UpdateUserResponseDTO()
+            {
+                //Set the UserID of the user form the passed UserDTO object
+                UserId = user.UserID
+            };
+
+            //Create a connection to the database using the SqlConnectionFactory
+            using var connection = _connectionFactory.CreateConnection();
+
+            //Create a command to execute the stored procedure spUpdateUserInformation
+            using var command = new SqlCommand("spUpdateUserInformation", connection)
+            {
+                //Set the command type to stored procedure
+                CommandType = CommandType.StoredProcedure
+            };
+
+            //Add parameters to the command
+            command.Parameters.AddWithValue("@UserID", user.UserID);
+            command.Parameters.AddWithValue("@Email", user.Email);
+            command.Parameters.AddWithValue("@PasswordHash", user.Password);
+            command.Parameters.AddWithValue("@ModifiedBy", "System");
+
+            //Add an output parameter to get the error message if any error occurs
+            var errorMessageParam = new SqlParameter("@ErrorMessage", SqlDbType.NVarChar, 255)
+            {
+                //Set the direction of the parameter to output
+                Direction = ParameterDirection.Output
+            };
+
+            //Add the output parameter to the command
+            command.Parameters.Add(errorMessageParam);
+
+            //Open the connection
+            await connection.OpenAsync();
+
+            //Execute the command
+            await command.ExecuteNonQueryAsync();
+
+            //Get the error message from the output parameter
+            var message = errorMessageParam.Value?.ToString();
+
+            //Check if the error message is null or empty
+            if(string.IsNullOrEmpty(message))
+            {
+                //Set the properties of the UpdateUserResponseDTO
+                updateUserResponseDTO.IsUpdated = true;
+                updateUserResponseDTO.Message = "User Updated Successfully";                
+            }
+            else
+            {
+                //Set the properties of the UpdateUserResponseDTO
+                updateUserResponseDTO.IsUpdated = false;
+                updateUserResponseDTO.Message = message;                
+            }
+
+            //Return the UpdateUserResponseDTO
+            return updateUserResponseDTO;
         }
     }
 }
