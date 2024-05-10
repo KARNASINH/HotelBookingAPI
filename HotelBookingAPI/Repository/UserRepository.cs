@@ -192,5 +192,57 @@ namespace HotelBookingAPI.Repository
         }
 
 
+
+
+        //This method is used to get a user by its ID
+        public async Task<UserResponseDTO> GetUserByIdAsync(int userId)
+        {
+            //Create a connection to the database using the SqlConnectionFactory
+            using var connection = _connectionFactory.CreateConnection();
+
+            //Create a command to execute the stored procedure spGetUserByID
+            using var command = new SqlCommand("spGetUserByID", connection)
+            {
+                //Set the command type to stored procedure
+                CommandType = CommandType.StoredProcedure
+            };
+
+            //Add a parameter to the command
+            command.Parameters.AddWithValue("@UserID", userId);
+
+            //Add an output parameter to get the error message if any error occurs
+            var errorMessageParam = new SqlParameter("@ErrorMessage", SqlDbType.NVarChar, 255) 
+            {
+                Direction = ParameterDirection.Output
+            };
+            
+            //Add the output parameter to the command
+            command.Parameters.Add(errorMessageParam);
+
+            //Open the connection
+            await connection.OpenAsync();
+
+            //Execute the command and get the data from the database
+            using var reader = await command.ExecuteReaderAsync();
+
+            //Read the data from the reader
+            if (!reader.Read())
+            {
+                //Return null if the user is not found
+                return null;
+            }
+
+            //Create an instance of UserResponseDTO
+            var user = new UserResponseDTO
+            {
+                //Set the properties of the UserResponseDTO
+                UserID = reader.GetInt32("UserID"),
+                Email = reader.GetString("Email"),
+                IsActive = reader.GetBoolean("IsActive")
+            };
+
+            //Return the User with data
+            return user;
+        }
     }
 }
