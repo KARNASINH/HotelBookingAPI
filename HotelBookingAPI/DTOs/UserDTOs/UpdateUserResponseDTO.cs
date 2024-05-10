@@ -2,8 +2,8 @@
 
 namespace HotelBookingAPI.DTOs.UserDTOs
 {
-    //This class is used to generate a response when a user logs in.
-    public class LoginUserResponseDTO
+    //This class generates a response when a user is updated.
+    public class UpdateUserResponseDTO
     {
         //Id of the user
         public int UserId { get; set; }
@@ -11,7 +11,8 @@ namespace HotelBookingAPI.DTOs.UserDTOs
         //Message to be displayed if any error occurs
         public string Message { get; set; }
 
-        //Is the user logged in
-        public bool IsLogin { get; set; }
+        //Is the user updated
+        public bool IsUpdated { get; set; }
+
     }
 }
