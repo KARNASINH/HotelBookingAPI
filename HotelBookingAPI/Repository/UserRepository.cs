@@ -373,5 +373,74 @@ namespace HotelBookingAPI.Repository
             //Return the DeleteUserResponseDTO
             return deleteUserResponseDTO;
         }
+
+
+        //This method is used to login a user
+        public async Task<LoginUserResponseDTO> LoginUserAsync(LoginUserDTO login)
+        {
+            //Create an instance of LoginUserResponseDTO
+            LoginUserResponseDTO userLoginResponseDTO = new LoginUserResponseDTO();
+
+            //Create a connection to the database using the SqlConnectionFactory
+            using var connection = _connectionFactory.CreateConnection();
+
+            //Create a command to execute the stored procedure spLoginUser
+            using var command = new SqlCommand("spLoginUser", connection);
+
+            //Set the command type to stored procedure
+            command.CommandType = CommandType.StoredProcedure;
+
+            //Add parameters to the command
+            command.Parameters.AddWithValue("@Email", login.Email);
+            command.Parameters.AddWithValue("@PasswordHash", login.Password); // Ensure password is hashed
+
+            //Add an output parameter to get the UserID of the user
+            var userIdParam = new SqlParameter("@UserID", SqlDbType.Int)
+            {
+                Direction = ParameterDirection.Output
+            };
+            
+            //Add an output parameter to get the error message if any error occurs
+            var errorMessageParam = new SqlParameter("@ErrorMessage", SqlDbType.NVarChar, 255)
+            {
+                Direction = ParameterDirection.Output 
+            };
+            
+            //Add the output parameters to the command
+            command.Parameters.Add(userIdParam);
+            command.Parameters.Add(errorMessageParam);
+
+            //Open the connection
+            await connection.OpenAsync();
+
+            //Execute the command
+            await command.ExecuteNonQueryAsync();
+
+            //Checking if the user is successfully logged in or not based on the value of the output parameter
+            var success = userIdParam.Value != DBNull.Value && (int)userIdParam.Value > 0;
+
+            //Get the error message from the output parameter
+            var message = errorMessageParam.Value?.ToString();
+
+
+            var userId = success ? Convert.ToInt32(userIdParam.Value) : -1;
+            
+            //Check if the user is successfully logged in
+            if (success)
+            {
+                //Set the properties of the LoginUserResponseDTO
+                userLoginResponseDTO.UserId = userId;
+                userLoginResponseDTO.IsLogin = true;
+                userLoginResponseDTO.Message = "Login Successful";
+            }
+            else
+            {
+            userLoginResponseDTO.IsLogin = false;
+            userLoginResponseDTO.Message = message;
+            }
+
+            //Return the LoginUserResponseDTO
+            return userLoginResponseDTO;
+        }
     }
 }

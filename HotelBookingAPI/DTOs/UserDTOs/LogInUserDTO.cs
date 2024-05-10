@@ -3,7 +3,7 @@
 namespace HotelBookingAPI.DTOs.UserDTOs
 {
     //This class holds the information about the user that is trying to log in
-    public class LogInUserDTO
+    public class LoginUserDTO
     {
         //Email of the user
         [Required(ErrorMessage = "Email is required")]
