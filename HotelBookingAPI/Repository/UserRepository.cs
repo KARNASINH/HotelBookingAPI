@@ -1,5 +1,6 @@
 ﻿using HotelBookingAPI.Connection;
 using HotelBookingAPI.DTOs.UserDTOs;
+using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Data;
@@ -312,6 +313,65 @@ namespace HotelBookingAPI.Repository
 
             //Return the UpdateUserResponseDTO
             return updateUserResponseDTO;
+        }
+
+
+
+        //This method is used to delete a user from the database.
+        public async Task<DeleteUserResponseDTO> DeleteUserAsync(int userId)
+        {
+            //Create an instance of DeleteUserResponseDTO
+            DeleteUserResponseDTO deleteUserResponseDTO = new DeleteUserResponseDTO();
+
+            //Create a connection to the database using the SqlConnectionFactory
+            using var connection = _connectionFactory.CreateConnection();
+
+            //Create a command to execute the stored procedure spToggleUserActive
+            using var command = new SqlCommand("spToggleUserActive", connection)
+            {
+                //Set the command type to stored procedure
+                CommandType = CommandType.StoredProcedure
+            };
+
+            //Add parameters to the command
+            command.Parameters.AddWithValue("@UserID", userId);
+            command.Parameters.AddWithValue("@IsActive", false);
+
+            //Add an output parameter to get the error message if any error occurs duruing the execution of the stored procedure
+            var errorMessageParam = new SqlParameter("@ErrorMessage", SqlDbType.NVarChar, 255)
+            {
+                //Set the direction of the parameter to output
+                Direction = ParameterDirection.Output
+            };
+
+            //Add the output parameter to the command
+            command.Parameters.Add(errorMessageParam);
+
+            //Open the connection
+            await connection.OpenAsync();
+
+            //Execute the command
+            await command.ExecuteNonQueryAsync();
+
+            //Get the error message from the output parameter
+            var message = errorMessageParam.Value?.ToString();
+
+            //Check if the error message is null or empty
+            if(!string.IsNullOrEmpty(message)) 
+            {
+                //Set the properties of the DeleteUserResponseDTO
+                deleteUserResponseDTO.IsDeleted = false;
+                deleteUserResponseDTO.Message = message;
+            }
+            else
+            {
+                //Set the properties of the DeleteUserResponseDTO
+                deleteUserResponseDTO.IsDeleted = true;
+                deleteUserResponseDTO.Message = "User Deleted Successfully";
+            }
+
+            //Return the DeleteUserResponseDTO
+            return deleteUserResponseDTO;
         }
     }
 }
