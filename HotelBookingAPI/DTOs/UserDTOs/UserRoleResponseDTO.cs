@@ -7,6 +7,6 @@
         public string Message { get; set; }
 
         //Is the user role assigned
-        public bool IsRoleAssigned { get; set; }
+        public bool IsAssigned { get; set; }
     }
 }

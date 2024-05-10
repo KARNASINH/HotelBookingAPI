@@ -83,5 +83,63 @@ namespace HotelBookingAPI.Repository
             //Return the CreateUserResponseDTO if any error occurs
             return createUserResponseDTO;
         }
+
+        //This method is used to assign a role to a user
+        public async  Task<UserRoleResponseDTO> AssignRoleToUserAsync(UserRoleDTO userRole)
+        {
+            //Create an instance of UserRoleResponseDTO
+            UserRoleResponseDTO userRoleResponseDTO = new UserRoleResponseDTO();
+
+            //Create a connection to the database using the SqlConnectionFactory
+            using var connection = _connectionFactory.CreateConnection();
+
+            //Create a command to execute the stored procedure spAssignRoleToUser
+            using var command = new SqlCommand("spAssignRoleToUser", connection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            //Add parameters to the command
+            command.Parameters.AddWithValue("@UserID", userRole.UserID);
+            command.Parameters.AddWithValue("@RoleID", userRole.RoleID);
+
+            //Add an output parameter to get the error message if any error occurs
+            var errorMessageParam = new SqlParameter("@ErrorMessage", SqlDbType.NVarChar, 255)
+            {
+                Direction = ParameterDirection.Output
+            };
+
+            //Add the output parameter to the command
+            command.Parameters.Add(errorMessageParam);
+
+            //Open the connection
+            await connection.OpenAsync();
+
+            //Execute the command
+            await command.ExecuteNonQueryAsync();
+
+            //Get the error message from the output parameter
+            var message = errorMessageParam.Value?.ToString();
+
+            //Check if the error message is null or empty
+            if (string.IsNullOrEmpty(message))
+            {
+                //Set the properties of the UserRoleResponseDTO
+                userRoleResponseDTO.IsAssigned = true;
+                userRoleResponseDTO.Message = "Role Assigned Successfully";
+
+                //Return the UserRoleResponseDTO if the role is assigned successfully
+                return userRoleResponseDTO;
+            }
+            else
+            {
+                //Set the properties of the UserRoleResponseDTO
+                userRoleResponseDTO.IsAssigned = false;
+                userRoleResponseDTO.Message = message;
+                
+                //Return the UserRoleResponseDTO if any error occurs
+                return userRoleResponseDTO;
+            }
+        }
     }
 }
