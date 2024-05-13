@@ -11,12 +11,19 @@ namespace HotelBookingAPI.Repository
         //Injecting SqlConnectionFactory object using DI.
         private readonly SqlConnectionFactory _connectionFactory;
 
+
+
+
         //Constructor to initialize SqlConnectionFactory object.
         public RoomTypeRepository(SqlConnectionFactory connectionFactory)
         {
             _connectionFactory = connectionFactory;
         }
 
+
+
+
+        
         //This method is used to retrieve all RoomTypes from the database.
         public async Task<List<RoomTypeDTO>> RetrieveAllRoomTypesAsync(bool? IsActive)
         {
@@ -60,5 +67,52 @@ namespace HotelBookingAPI.Repository
             return roomTypes;
         }
 
+
+
+
+
+        //This method is used to retrieve a RoomType by its ID from the database.
+        public async Task<RoomTypeDTO> RetrieveRoomTypeByIdAsync(int RoomTypeID)
+        {
+            //Creating a new SqlConnection object using the CreateConnection method of SqlConnectionFactory.
+            using var connection = _connectionFactory.CreateConnection();
+
+            //Creating a new SqlCommand object to execute the stored procedure spGetRoomTypeById.
+            var command = new SqlCommand("spGetRoomTypeById", connection)
+            {
+                //Setting the command type to stored procedure.
+                CommandType = CommandType.StoredProcedure
+            };
+
+            //Adding the RoomTypeID parameter to the command.
+            command.Parameters.AddWithValue("@RoomTypeID", RoomTypeID);
+
+            //Opening the connection.
+            await connection.OpenAsync();
+
+            //Executing the command and storing the result in a SqlDataReader object.
+            using var reader = await command.ExecuteReaderAsync();
+
+            //Checking if the SqlDataReader object has any rows.
+            if (!reader.Read())
+            {
+                //Returning null if no rows are found.
+                return null;
+            }
+
+            //Creating a new RoomTypeDTO object and setting its properties using the values from the SqlDataReader object.
+            var roomType = new RoomTypeDTO
+            {
+                //Setting the RoomTypeDTO properties using the values from the SqlDataReader object.
+                RoomTypeID = RoomTypeID,
+                TypeName = reader.GetString("TypeName"),
+                AccessibilityFeatures = reader.GetString("AccessibilityFeatures"),
+                Description = reader.GetString("Description"),
+                IsActive = reader.GetBoolean("IsActive")
+            };
+
+            //Returning the RoomTypeDTO object.
+            return roomType;
+        }
     }
 }
