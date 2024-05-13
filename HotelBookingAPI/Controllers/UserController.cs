@@ -251,8 +251,46 @@ namespace HotelBookingAPI.Controllers
         }
 
 
+        //APi Endpoint to login the user.
+        [HttpPost("Login")]
+        public async Task<APIResponse<LoginUserResponseDTO>> LoginUser([FromBody] LoginUserDTO loginUserDTO)
+        {
+            //Log the request received for LoginUser.
+            _logger.LogInformation("Request Received for LoginUser {@LoginUserDTO}", loginUserDTO);
 
+            //Check if the request body is valid.
+            if (!ModelState.IsValid)
+            {
+                //Log the Bad Request details if the request body is invalid.
+                return new APIResponse<LoginUserResponseDTO>(HttpStatusCode.BadRequest, "Invalid Data in the Requrest Body");
+            }
 
+            //Try to login the user.
+            try
+            {
+                //Call the LoginUserAsync method from UserRepository to login the user.
+                var response = await _userRepository.LoginUserAsync(loginUserDTO);
 
+                //Check if the user is logged in successfully.
+                if (response.IsLogin)
+                {
+                    //Return the response with the user details and meaningful message.
+                    return new APIResponse<LoginUserResponseDTO>(response, response.Message);
+                }
+
+                //Return the response with the error message if the user is not logged in suffessfully.
+                return new APIResponse<LoginUserResponseDTO>(HttpStatusCode.BadRequest, response.Message);
+            }
+
+            //Catch the exception if any error occurs during the execution of the Action Method.
+            catch (Exception ex)
+            {
+                //Log the error if any error occurs during the execution of the Action Method.
+                _logger.LogError(ex, "Error logging in user with email {Email}", loginUserDTO.Email);
+
+                //Return Internal Server Error if any error occurs during the execion of the Action Method.
+                return new APIResponse<LoginUserResponseDTO>(HttpStatusCode.InternalServerError, "Login failed.", ex.Message);
+            }
+        }
     }
 }
