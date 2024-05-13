@@ -1,4 +1,5 @@
 using HotelBookingAPI.Connection;
+using HotelBookingAPI.Repository;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,9 @@ builder.Services.AddSwaggerGen();
 
 //Adding SqlConnectionFactory service into DI.
 builder.Services.AddTransient<SqlConnectionFactory>();
+
+//Add services to the container.
+builder.Services.AddScoped<UserRepository>();
 
 var app = builder.Build();
 
