@@ -203,5 +203,56 @@ namespace HotelBookingAPI.Controllers
                 return new APIResponse<UpdateUserResponseDTO>(HttpStatusCode.InternalServerError, "Update Failed.", ex.Message);
             }
         }
+
+
+        //API Endpoint to delete the User based on the User ID.
+        [HttpDelete("Delete/{id}")]
+        public async Task<APIResponse<DeleteUserResponseDTO>> DeleteUser(int id)
+        {
+            //Log the request received for DeleteUser.
+            _logger.LogInformation($"Request Received for DeleteUser, Id: {id}");
+
+            //Try to delete the user from the database.
+            try
+            {
+                //Call the DeleteUserAsync method from UserRepository to delete the user.
+                var user = await _userRepository.GetUserByIdAsync(id);
+
+                //Check if the user is found in the database.
+                if (user == null)
+                {
+                    //Return Not Found if the user is not found in the database.
+                    return new APIResponse<DeleteUserResponseDTO>(HttpStatusCode.NotFound, "User not found.");
+                }
+
+                //Call the DeleteUserAsync method from UserRepository to delete the user.
+                var response = await _userRepository.DeleteUserAsync(id);
+
+                //Check if the user is deleted successfully.
+                if (response.IsDeleted)
+                {
+                    //Return the response with the deleted user details and meaningful message.
+                    return new APIResponse<DeleteUserResponseDTO>(response, response.Message);
+                }
+
+                //Return the response with the error message if the user is not deleted.
+                return new APIResponse<DeleteUserResponseDTO>(HttpStatusCode.BadRequest, response.Message);
+            }
+
+            //Catch the exception if any error occurs during the execution of the Action Method.
+            catch (Exception ex)
+            {
+                //Log the error if any error occurs during the execution of the Action Method.
+                _logger.LogError(ex, "Error deleting user {UserID}", id);
+
+                //Return Internal Server Error if any error occurs during the execion of the Action Method.
+                return new APIResponse<DeleteUserResponseDTO>(HttpStatusCode.InternalServerError, "Internal server error: " + ex.Message);
+            }
+        }
+
+
+
+
+
     }
 }
