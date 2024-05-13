@@ -297,5 +297,38 @@ namespace HotelBookingAPI.Controllers
 
 
 
+
+        //API Endpoint to make user Active or Inactive based on the given boolean value.
+        //Pass 0 to make the user Inactive.
+        //Pass 1 to make the user Active.
+        [HttpPost("ToggleActive")]
+        public async Task<IActionResult> ToggleActive(int userId, bool isActive)
+        {
+            //Try to toggle the active status of the user.
+            try
+            {
+                //Call the ToggleUserActiveAsync method from UserRepository to toggle the active status of the user.
+                var result = await _userRepository.ToggleUserActiveAsync(userId, isActive);
+
+                //Check if the active status is updated successfully.
+                if (result.Success)
+                    //Return the response with Http Status Code 200 and meaningful message.
+                    return Ok(new { Message = "User activation status updated successfully." });
+                else
+                    //Return the response with Http Status Code 400 and error message.
+                    return BadRequest(new { Message = result.Message });
+            }
+
+            catch (Exception ex)
+            {
+                //Log the error if any error occurs during the execution of the Action Method.
+                _logger.LogError(ex, "Error toggling active status for user {UserID}", userId);
+
+                //Return Internal Server Error if any error occurs during the execion of the Action Method.
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
+
+
     }
 }
