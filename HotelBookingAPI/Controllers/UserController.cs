@@ -75,6 +75,7 @@ namespace HotelBookingAPI.Controllers
         }
 
 
+
         //API Endpoint to assign a role to a user.
         [HttpPost("AssignRole")]
         public async Task<APIResponse<UserRoleResponseDTO>> AssignRole(UserRoleDTO userRoleDTO)
@@ -118,6 +119,39 @@ namespace HotelBookingAPI.Controllers
                 return new APIResponse<UserRoleResponseDTO>(HttpStatusCode.InternalServerError, "Role Assigned Failed.", ex.Message);
             }
         }
+
+
+
+        //API Endpoint to get all the users.
+        [HttpGet("AllUsers")]
+        public async Task<APIResponse<List<UserResponseDTO>>> GetAllUsers(bool? isActive = null)
+        {
+            //Log the request received for GetAllUsers.
+            _logger.LogInformation($"Request Received for GetAllUsers, IsActive: {isActive}");
+
+            //Try to get all the users from the database.
+            try
+            {
+                //Call the ListAllUsersAsync method from UserRepository to get all the users.
+                var users = await _userRepository.ListAllUsersAsync(isActive);
+
+                //Return the response with the list of users and meaningful message.
+                return new APIResponse<List<UserResponseDTO>>(users, "Retrieved all Users Successfully.");
+            }
+
+            //Catch the exception if any error occurs during the execution of the Action Method.
+            catch (Exception ex)
+            {
+                //Log the error if any error occurs during the execution of the Action Method.
+                _logger.LogError(ex, "Error listing users");
+
+                //Return Internal Server Error if any error occurs during the execion of the Action Method.
+                return new APIResponse<List<UserResponseDTO>>(HttpStatusCode.InternalServerError, "Internal server error: " + ex.Message);
+            }
+        }
+
+
+
 
     }
 }
