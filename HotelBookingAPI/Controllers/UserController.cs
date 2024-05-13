@@ -14,8 +14,12 @@ namespace HotelBookingAPI.Controllers
         //UserRepository instance to access the User data.
         private readonly UserRepository _userRepository;
 
+        
+        
         //Logger instance to log the information or errors.
         private readonly ILogger<UserController> _logger;
+
+
 
         //Constructor to initialize the UserRepository and Logger objects.
         public UserController(UserRepository userRepository, ILogger<UserController> logger)
@@ -23,6 +27,8 @@ namespace HotelBookingAPI.Controllers
             _userRepository = userRepository;
             _logger = logger;
         }
+
+
 
         //API Endpoint to add a new user.
         [HttpPost("AddUser")]
@@ -67,5 +73,51 @@ namespace HotelBookingAPI.Controllers
                 return new APIResponse<CreateUserResponseDTO>(HttpStatusCode.InternalServerError, "Registration Failed.", ex.Message);
             }
         }
+
+
+        //API Endpoint to assign a role to a user.
+        [HttpPost("AssignRole")]
+        public async Task<APIResponse<UserRoleResponseDTO>> AssignRole(UserRoleDTO userRoleDTO)
+        {
+            //Log the request received for AssignRole.
+            _logger.LogInformation("Request Received for AssignRole: {@UserRoleDTO}", userRoleDTO);
+
+            //Check if the request body is valid.
+            if (!ModelState.IsValid)
+            {
+                //Return Bad Request if the request body is invalid.
+                _logger.LogInformation("Invalid Data in the Request Body");
+
+                //Return Bad Request if the request body is invalid.
+                return new APIResponse<UserRoleResponseDTO>(HttpStatusCode.BadRequest, "Invalid Data in the Requrest Body");
+            }
+            try
+            {
+                //Call the AssignRoleToUserAsync method from UserRepository to assign the role to the user.
+                var response = await _userRepository.AssignRoleToUserAsync(userRoleDTO);
+
+                //Log the response received from the repository.
+                _logger.LogInformation("AssignRole Response From Repository: {@UserRoleResponseDTO}", response);
+
+                //Check if the role is assigned successfully.
+                if (response.IsAssigned)
+                {
+                    //Returb the response with Data and Message.
+                    return new APIResponse<UserRoleResponseDTO>(response, response.Message);
+                }
+
+                //Return the response with the error message.
+                return new APIResponse<UserRoleResponseDTO>(HttpStatusCode.BadRequest, response.Message);
+            }
+            catch (Exception ex)
+            {
+                //Log the error if any error occurs during the execution of the Action Method.
+                _logger.LogError(ex, "Error assigning role {RoleID} to user {UserID}", userRoleDTO.RoleID, userRoleDTO.UserID);
+
+                //Return Internal Server Error if any error occurs during the execion of the Action Method.
+                return new APIResponse<UserRoleResponseDTO>(HttpStatusCode.InternalServerError, "Role Assigned Failed.", ex.Message);
+            }
+        }
+
     }
 }
