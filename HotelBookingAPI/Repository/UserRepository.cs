@@ -251,7 +251,6 @@ namespace HotelBookingAPI.Repository
 
 
 
-
         //This method is used to update the user details
         public async Task<UpdateUserResponseDTO> UpdateUserAsync(UpdateUserDTO user)
         {

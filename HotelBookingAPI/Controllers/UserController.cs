@@ -152,6 +152,56 @@ namespace HotelBookingAPI.Controllers
 
 
 
+        //API Endpoint to update the User details based on the User ID.
+        [HttpPut("Update/{id}")]
+        public async Task<APIResponse<UpdateUserResponseDTO>> UpdateUser(int id, [FromBody] UpdateUserDTO updateUserDTO)
+        {
+            //Log the request received for UpdateUser.
+            _logger.LogInformation("Request Received for UpdateUser {@UpdateUserDTO}", updateUserDTO);
 
+            //Check if the request body is valid.
+            if (!ModelState.IsValid)
+            {
+                //Log the Bad Request details if the request body is invalid.
+                _logger.LogInformation("UpdateUser Invalid Request Body");
+
+                //Return Bad Request if the request body is invalid.
+                return new APIResponse<UpdateUserResponseDTO>(HttpStatusCode.BadRequest, "Invalid Request Body");
+            }
+
+            //Check if the User ID in the request URL and the User ID in the request body are same.
+            if (id != updateUserDTO.UserID)
+            {
+                //Log the Mismatched User ID message.
+                _logger.LogInformation("UpdateUser Mismatched User ID.");
+
+                //Return Bad Request if the User ID in the request URL and the User ID in the request body are different.
+                return new APIResponse<UpdateUserResponseDTO>(HttpStatusCode.BadRequest, "Mismatched User ID.");
+            }
+            try
+            {
+                //Call the UpdateUserAsync method from UserRepository to update the user.
+                var response = await _userRepository.UpdateUserAsync(updateUserDTO);
+
+                //Check if the user is updated successfully.
+                if (response.IsUpdated)
+                {
+                    //Return the response with the updated user details and meaningful message.
+                    return new APIResponse<UpdateUserResponseDTO>(response, response.Message);
+                }
+
+                //Return the response with the error message if the user is not updated.
+                return new APIResponse<UpdateUserResponseDTO>(HttpStatusCode.BadRequest, response.Message);
+            }
+            //Catch the exception if any error occurs during the execution of the Action Method.
+            catch (Exception ex)
+            {
+                //Log the error if any error occurs during the execution of the Action Method.
+                _logger.LogError(ex, "Error updating user {UserID}", updateUserDTO.UserID);
+
+                //Return Internal Server Error if any error occurs during the execion of the Action Method.
+                return new APIResponse<UpdateUserResponseDTO>(HttpStatusCode.InternalServerError, "Update Failed.", ex.Message);
+            }
+        }
     }
 }
