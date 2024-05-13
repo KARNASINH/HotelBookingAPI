@@ -441,5 +441,45 @@ namespace HotelBookingAPI.Repository
             //Return the LoginUserResponseDTO
             return userLoginResponseDTO;
         }
+
+        
+        //This method is used to toggle the active status of a user
+        //Only Admin access can have access to this feture.
+        public async Task<(bool Success, string Message)> ToggleUserActiveAsync(int userId, bool isActive)
+        {
+            //Create a connection to the database using the SqlConnectionFactory
+            using var connection = _connectionFactory.CreateConnection();
+
+            //Create a command to execute the stored procedure spToggleUserActive
+            using var command = new SqlCommand("spToggleUserActive", connection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            //Add parameters to the command
+            command.Parameters.AddWithValue("@UserID", userId);
+            command.Parameters.AddWithValue("@IsActive", isActive);
+
+            //Add an output parameter to get the error message if any error occurs
+            var errorMessageParam = new SqlParameter("@ErrorMessage", SqlDbType.NVarChar, 255) { Direction = ParameterDirection.Output };
+
+            //Add the output parameter to the command
+            command.Parameters.Add(errorMessageParam);
+
+            //Open the connection
+            await connection.OpenAsync();
+
+            //Execute the command
+            await command.ExecuteNonQueryAsync();
+
+            //Get the error message from the output parameter
+            var message = errorMessageParam.Value?.ToString();
+
+            //Check if the error message is null or empty
+            var success = string.IsNullOrEmpty(message);
+
+            //Return the success and message
+            return (success, message);
+        }
     }
 }

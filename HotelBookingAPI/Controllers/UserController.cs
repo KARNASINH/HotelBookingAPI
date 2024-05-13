@@ -251,6 +251,8 @@ namespace HotelBookingAPI.Controllers
         }
 
 
+        
+        
         //APi Endpoint to login the user.
         [HttpPost("Login")]
         public async Task<APIResponse<LoginUserResponseDTO>> LoginUser([FromBody] LoginUserDTO loginUserDTO)
@@ -292,5 +294,8 @@ namespace HotelBookingAPI.Controllers
                 return new APIResponse<LoginUserResponseDTO>(HttpStatusCode.InternalServerError, "Login failed.", ex.Message);
             }
         }
+
+
+
     }
 }
