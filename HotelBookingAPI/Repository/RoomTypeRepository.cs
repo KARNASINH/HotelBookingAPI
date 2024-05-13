@@ -114,5 +114,82 @@ namespace HotelBookingAPI.Repository
             //Returning the RoomTypeDTO object.
             return roomType;
         }
+
+
+
+
+        //This method is used to create a new RoomType in the database.
+        public async Task<CreateRoomTypeResponseDTO> CreateRoomType(CreateRoomTypeDTO request)
+        {
+            //Creating a new CreateRoomTypeResponseDTO object to store the response.
+            CreateRoomTypeResponseDTO createRoomTypeResponseDTO = new CreateRoomTypeResponseDTO();
+        
+            //Creating a new SqlConnection object using the CreateConnection method of SqlConnectionFactory.
+            using var connection = _connectionFactory.CreateConnection();
+            
+            //Creating a new SqlCommand object to execute the stored procedure spCreateRoomType.
+            var command = new SqlCommand("spCreateRoomType", connection)
+            {
+                //Setting the command type to stored procedure.
+                CommandType = CommandType.StoredProcedure
+            };
+            
+            //Adding the parameters to the command.
+            command.Parameters.Add(new SqlParameter("@TypeName", request.TypeName));
+            command.Parameters.Add(new SqlParameter("@AccessibilityFeatures", request.AccessibilityFeatures));
+            command.Parameters.Add(new SqlParameter("@Description", request.Description));
+            command.Parameters.Add(new SqlParameter("@CreatedBy", "System"));
+            
+            //Adding the output parameters to the command.
+            var outputId = new SqlParameter("@NewRoomTypeID", SqlDbType.Int) { Direction = ParameterDirection.Output };
+            var statusCode = new SqlParameter("@StatusCode", SqlDbType.Int) { Direction = ParameterDirection.Output };
+            var message = new SqlParameter("@Message", SqlDbType.NVarChar, 255) { Direction = ParameterDirection.Output };
+            
+            //Adding the output parameters to the command.
+            command.Parameters.Add(outputId);
+            command.Parameters.Add(statusCode);
+            command.Parameters.Add(message);
+
+            //Trying to create a RoomType into the database.        
+            try
+            {
+                //Opening the connection.
+                await connection.OpenAsync();
+                
+                //Executing the command asynchronously to create a new RoomType.
+                await command.ExecuteNonQueryAsync();
+                
+                //Checking the status code to determine if the RoomType was created successfully.
+                if ((int)statusCode.Value == 0)
+                {
+                    //Setting the response properties.
+                    createRoomTypeResponseDTO.Message = message.Value.ToString();
+                    createRoomTypeResponseDTO.IsCreated = true;
+                    createRoomTypeResponseDTO.RoomTypeId = (int)outputId.Value;
+                
+                    //Returning the response.
+                    return createRoomTypeResponseDTO;
+                }
+
+                //Setting the response properties if the RoomType was not created successfully.
+                createRoomTypeResponseDTO.Message = message.Value.ToString();
+                createRoomTypeResponseDTO.IsCreated = false;
+                
+                //Returning the unsuccessful RoomTye creation response.
+                return createRoomTypeResponseDTO;
+            }
+            //Catching any SqlException that may occur during the RoomType creation process.
+            catch (SqlException ex)
+            {
+                //Setting the response properties if an exception occurs.
+                createRoomTypeResponseDTO.Message = ex.Message;
+                
+                //Setting the response properties if the RoomType was not created successfully.
+                createRoomTypeResponseDTO.IsCreated = false;
+                
+                //Returning the unsuccessful RoomTye creation response.
+                return createRoomTypeResponseDTO;
+            }
+        }
     }
 }
