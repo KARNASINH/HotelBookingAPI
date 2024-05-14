@@ -9,7 +9,7 @@ namespace HotelBookingAPI.Controllers
     //API Controller for User which holds all the endpoints related to User operations.
     [ApiController]
     [Route("[Controller]")]
-    public class UserController : Controller
+    public class UserController : ControllerBase
     {
         //UserRepository instance to access the User data.
         private readonly UserRepository _userRepository;
