@@ -242,5 +242,35 @@ namespace HotelBookingAPI.Controllers
                 return new APIResponse<DeleteRoomTypeResponseDTO>(HttpStatusCode.InternalServerError, "Internal server error: " + ex.Message);
             }
         }
+
+
+
+        //API endpoint to toggle the active status of the RoomType by RoomTypeId.
+        [HttpPost("ActiveInActive")]
+        public async Task<IActionResult> ToggleActive(int RoomTypeId, bool IsActive)
+        {
+            //Try to toggle the active status of the RoomType by RoomTypeId.
+            try
+            {
+                //Toggle the active status of the RoomType by RoomTypeId using the RoomTypeRepository's ToggleRoomTypeActiveAsync method.
+                var result = await _roomTypeRepository.ToggleRoomTypeActiveAsync(RoomTypeId, IsActive);
+
+                //Check if the result is successful.
+                if (result.Success)
+                    //Return the OK response if the active status of the RoomType is toggled successfully.
+                    return Ok(new { Message = "RoomType activation status updated successfully." });
+                else
+                    //Return the Bad Request response if the active status of the RoomType is not toggled successfully.
+                    return BadRequest(new { Message = result.Message });
+            }
+            catch (Exception ex)
+            {
+                //Log the error message if any error occurs during the Try block.
+                _logger.LogError(ex, "Error toggling active status for RoomTypeId {RoomTypeId}", RoomTypeId);
+
+                //Return the Internal Server Error response if any error occurs in the Try block along with 500 status code.
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
     }
 }
