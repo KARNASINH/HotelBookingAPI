@@ -89,5 +89,55 @@ namespace HotelBookingAPI.Controllers
                 return new APIResponse<RoomTypeDTO>(HttpStatusCode.BadRequest, "Error fetching Room Type .", ex.Message);
             }
         }
+
+
+
+
+        //API endpoint to Create a new RoomType with the provided details.
+        [HttpPost("AddRoomType")]
+        public async Task<APIResponse<CreateRoomTypeResponseDTO>> CreateRoomType([FromBody] CreateRoomTypeDTO request)
+        {
+            //Log the request received to create a new RoomType.
+            _logger.LogInformation("Request Received for CreateRoomType: {@CreateRoomTypeDTO}", request);
+
+            //Check if the request body is valid.
+            if (!ModelState.IsValid)
+            {
+                //Log the error message if the request body is invalid.
+                _logger.LogInformation("Invalid Data in the Request Body");
+
+                //Return the Bad Request response if the request body is invalid along with 400 status code.
+                return new APIResponse<CreateRoomTypeResponseDTO>(HttpStatusCode.BadRequest, "Invalid Data in the Requrest Body");
+            }
+
+            //Try to create a new RoomType.
+            try
+            {
+                //Create a new RoomType using the RoomTypeRepository's CreateRoomType method.
+                var response = await _roomTypeRepository.CreateRoomType(request);
+
+                //Log the response received from the repository.
+                _logger.LogInformation("CreateRoomType Response From Repository: {@CreateRoomTypeResponseDTO}", response);
+
+                //Check if the RoomType is created successfully.
+                if (response.IsCreated)
+                {
+                    //Return the RoomType created response if the RoomType is created successfully along with 200 status code.
+                    return new APIResponse<CreateRoomTypeResponseDTO>(response, response.Message);
+                }
+
+                //Return the Bad Request response if the RoomType is not created successfully along with 400 status code.
+                return new APIResponse<CreateRoomTypeResponseDTO>(HttpStatusCode.BadRequest, response.Message);
+            }
+            //Catch the exception if any error occurs.
+            catch (Exception ex)
+            {
+                //Log the error message if any error occurs during the Try block.
+                _logger.LogError(ex, "Error adding new Room Type with Name {TypeName}", request.TypeName);
+
+                //Return the Internal Server Error response if any error occurs in the Try block along with 500 status code.
+                return new APIResponse<CreateRoomTypeResponseDTO>(HttpStatusCode.InternalServerError, "Room Type Creation Failed.", ex.Message);
+            }
+        }
     }
 }
