@@ -139,5 +139,62 @@ namespace HotelBookingAPI.Controllers
                 return new APIResponse<CreateRoomTypeResponseDTO>(HttpStatusCode.InternalServerError, "Room Type Creation Failed.", ex.Message);
             }
         }
+
+
+
+
+        //API endpoint to Update the RoomType with the provided details.
+        [HttpPut("Update/{RoomTypeId}")]
+        public async Task<APIResponse<UpdateRoomTypeResponseDTO>> UpdateRoomType(int RoomTypeId, [FromBody] UpdateRoomTypeDTO request)
+        {
+            //Log the request received to update the RoomType.
+            _logger.LogInformation("Request Received for UpdateRoomType {@UpdateRoomTypeDTO}", request);
+
+            //Check if the request body is valid.
+            if (!ModelState.IsValid)
+            {
+                //Log the error message if the request body is invalid.
+                _logger.LogInformation("UpdateRoomType Invalid Request Body");
+
+                //Return the Bad Request response if the request body is invalid along with 400 status code.
+                return new APIResponse<UpdateRoomTypeResponseDTO>(HttpStatusCode.BadRequest, "Invalid Request Body");
+            }
+
+            //Check if the RoomTypeId in the request body and the RoomTypeId in the URL are the same.
+            if (RoomTypeId != request.RoomTypeID)
+            {
+                //Log the error message if the RoomTypeId in the request body and the RoomTypeId in the URL are not the same.
+                _logger.LogInformation("UpdateRoomType Mismatched Room Type ID");
+
+                //Return the Bad Request response if the RoomTypeId in the request body and the RoomTypeId in the URL are not the same along with 400 status code.
+                return new APIResponse<UpdateRoomTypeResponseDTO>(HttpStatusCode.BadRequest, "Mismatched Room Type ID.");
+            }
+
+            //Try to update the RoomType.
+            try
+            {
+                //Update the RoomType using the RoomTypeRepository's UpdateRoomType method.
+                var response = await _roomTypeRepository.UpdateRoomType(request);
+
+                //Log the response received from the repository.
+                if (response.IsUpdated)
+                {
+                    //Return the RoomType updated response if the RoomType is updated successfully along with 200 status code.
+                    return new APIResponse<UpdateRoomTypeResponseDTO>(response, response.Message);
+                }
+
+                //Return the Bad Request response if the RoomType is not updated successfully along with 400 status code.
+                return new APIResponse<UpdateRoomTypeResponseDTO>(HttpStatusCode.BadRequest, response.Message);
+            }
+            //Catch the exception if any error occurs.
+            catch (Exception ex)
+            {
+                //Log the error message if any error occurs during the Try block.
+                _logger.LogError(ex, "Error Updating Room Type {RoomTypeId}", RoomTypeId);
+
+                //Return the Internal Server Error response if any error occurs in the Try block along with 500 status code.
+                return new APIResponse<UpdateRoomTypeResponseDTO>(HttpStatusCode.InternalServerError, "Update Room Type Failed.", ex.Message);
+            }
+        }
     }
 }
