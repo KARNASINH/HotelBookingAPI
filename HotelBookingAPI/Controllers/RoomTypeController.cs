@@ -196,5 +196,51 @@ namespace HotelBookingAPI.Controllers
                 return new APIResponse<UpdateRoomTypeResponseDTO>(HttpStatusCode.InternalServerError, "Update Room Type Failed.", ex.Message);
             }
         }
+
+
+
+        //API endpoint to Delete the RoomType by RoomTypeId.
+        [HttpDelete("Delete/{RoomTypeId}")]
+        public async Task<APIResponse<DeleteRoomTypeResponseDTO>> DeleteRoomType(int RoomTypeId)
+        {
+            //Log the request received to delete the RoomType by RoomTypeId.
+            _logger.LogInformation($"Request Received for DeleteRoomType, RoomTypeId: {RoomTypeId}");
+
+            //Try to delete the RoomType by RoomTypeId.
+            try
+            {
+                //Retrieve the RoomType by RoomTypeId using the RoomTypeRepository's RetrieveRoomTypeByIdAsync method.
+                var roomType = await _roomTypeRepository.RetrieveRoomTypeByIdAsync(RoomTypeId);
+
+                //Check if the RoomType is null.
+                if (roomType == null)
+                {
+                    //Return the Not Found response if the RoomType is not found along with 404 status code.
+                    return new APIResponse<DeleteRoomTypeResponseDTO>(HttpStatusCode.NotFound, "RoomType not found.");
+                }
+
+                //Delete the RoomType by RoomTypeId using the RoomTypeRepository's DeleteRoomType method.
+                var response = await _roomTypeRepository.DeleteRoomType(RoomTypeId);
+
+                //Checks if the RoomType is deleted successfully using the value stored in IsDeleted property.
+                if (response.IsDeleted)
+                {
+                    //Return the RoomType deleted response if the RoomType is deleted successfully along with 200 status code.
+                    return new APIResponse<DeleteRoomTypeResponseDTO>(response, response.Message);
+                }
+
+                //Return the Bad Request response if the RoomType is not deleted successfully along with 400 status code.
+                return new APIResponse<DeleteRoomTypeResponseDTO>(HttpStatusCode.BadRequest, response.Message);
+            }
+            //Catch the exception if any error occurs.
+            catch (Exception ex)
+            {
+                //Log the error message if any error occurs during the Try block.
+                _logger.LogError(ex, "Error deleting RoomType {RoomTypeId}", RoomTypeId);
+
+                //Return the Internal Server Error response if any error occurs in the Try block along with 500 status code.
+                return new APIResponse<DeleteRoomTypeResponseDTO>(HttpStatusCode.InternalServerError, "Internal server error: " + ex.Message);
+            }
+        }
     }
 }
