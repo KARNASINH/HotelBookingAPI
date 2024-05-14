@@ -271,5 +271,69 @@ namespace HotelBookingAPI.Repository
                 return updateRoomTypeResponseDTO;
             }
         }
+
+
+
+        //This method is used to delete a RoomType from the database.
+        public async Task<DeleteRoomTypeResponseDTO> DeleteRoomType(int RoomTypeID)
+        {
+            //Creating a new DeleteRoomTypeResponseDTO object to store the response while deleting the RoomType.
+            DeleteRoomTypeResponseDTO deleteRoomTypeResponseDTO = new DeleteRoomTypeResponseDTO();
+            
+            //Creating a new SqlConnection object using the CreateConnection method of SqlConnectionFactory.
+            using var connection = _connectionFactory.CreateConnection();
+            
+            //Creating a new SqlCommand object to execute the stored procedure spToggleRoomTypeActive.
+            var command = new SqlCommand("spToggleRoomTypeActive", connection)
+            {
+                //Setting the command type to stored procedure.
+                CommandType = CommandType.StoredProcedure
+            };
+            
+            //Adding the parameters to the command.
+            command.Parameters.Add(new SqlParameter("@RoomTypeID", RoomTypeID));
+            command.Parameters.AddWithValue("@IsActive", false);
+            
+            //Adding the output parameters to the command.
+            var statusCode = new SqlParameter("@StatusCode", SqlDbType.Int)
+            {
+                //Setting the direction of the parameter to output.
+                Direction = ParameterDirection.Output
+            };
+            
+            var message = new SqlParameter("@Message", SqlDbType.NVarChar, 255)
+            {
+                Direction = ParameterDirection.Output
+            };
+            
+            //Adding the output parameters to the command.
+            command.Parameters.Add(statusCode);
+            command.Parameters.Add(message);
+            
+            //Trying to delete the RoomType from the database.
+            try
+            {
+                //Opening the connection.
+                await connection.OpenAsync();
+                await command.ExecuteNonQueryAsync();
+                
+                //Setting the response properties using the output parameters.
+                deleteRoomTypeResponseDTO.Message = "Room Type Deleted Successfully";
+                deleteRoomTypeResponseDTO.IsDeleted = (int)statusCode.Value == 0;
+                
+                //Returning the response.
+                return deleteRoomTypeResponseDTO;
+            }
+            //Catching any SqlException that may occur during the RoomType deletion process execution.
+            catch (SqlException ex)
+            {
+                //Setting the response properties if an exception occurs.
+                deleteRoomTypeResponseDTO.Message = ex.Message;
+                deleteRoomTypeResponseDTO.IsDeleted = false;
+                
+                //Returning the unsuccessful RoomType deletion response.
+                return deleteRoomTypeResponseDTO;
+            }
+        }
     }
 }
