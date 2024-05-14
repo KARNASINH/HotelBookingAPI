@@ -274,6 +274,7 @@ namespace HotelBookingAPI.Repository
 
 
 
+
         //This method is used to delete a RoomType from the database.
         public async Task<DeleteRoomTypeResponseDTO> DeleteRoomType(int RoomTypeID)
         {
@@ -334,6 +335,57 @@ namespace HotelBookingAPI.Repository
                 //Returning the unsuccessful RoomType deletion response.
                 return deleteRoomTypeResponseDTO;
             }
+        }
+
+
+
+
+        //This method is used to toggle Active status of a RoomType in the database.
+        public async Task<(bool Success, string Message)> ToggleRoomTypeActiveAsync(int RoomTypeID, bool IsActive)
+        {
+            //Creating a new SqlConnection object using the CreateConnection method of SqlConnectionFactory.
+            using var connection = _connectionFactory.CreateConnection();
+
+            //Creating a new SqlCommand object to execute the stored procedure spToggleRoomTypeActive.
+            using var command = new SqlCommand("spToggleRoomTypeActive", connection)
+            {
+                //Setting the command type to stored procedure.
+                CommandType = CommandType.StoredProcedure
+            };
+
+            //Adding the parameters to the command.
+            command.Parameters.Add(new SqlParameter("@RoomTypeID", RoomTypeID));
+            command.Parameters.AddWithValue("@IsActive", IsActive);
+
+            //Adding the output parameters to the command.
+            var statusCode = new SqlParameter("@StatusCode", SqlDbType.Int)
+            {
+                //Setting the direction of the parameter to output.
+                Direction = ParameterDirection.Output
+            };
+            var message = new SqlParameter("@Message", SqlDbType.NVarChar, 255)
+            {
+                Direction = ParameterDirection.Output
+            };
+
+            //Adding the output parameters to the command.
+            command.Parameters.Add(statusCode);
+            command.Parameters.Add(message);
+
+            //Opening the connection.
+            await connection.OpenAsync();
+
+            //Executing the command asynchronously to toggle the RoomType's active status.
+            await command.ExecuteNonQueryAsync();
+
+            //Getting the value of the message parameter.
+            var ResponseMessage = message.Value.ToString();
+
+            //Checking the status code to determine if the RoomType's active status was toggled successfully
+            var success = (int)statusCode.Value == 0;
+
+            //Returning the success status and message.
+            return (success, ResponseMessage);
         }
     }
 }
