@@ -118,6 +118,7 @@ namespace HotelBookingAPI.Repository
 
 
 
+
         //This method is used to create a new RoomType in the database.
         public async Task<CreateRoomTypeResponseDTO> CreateRoomType(CreateRoomTypeDTO request)
         {
@@ -189,6 +190,85 @@ namespace HotelBookingAPI.Repository
                 
                 //Returning the unsuccessful RoomTye creation response.
                 return createRoomTypeResponseDTO;
+            }
+        }
+
+
+
+
+
+        //This method is used to update an existing RoomType in the database.
+        public async Task<UpdateRoomTypeResponseDTO> UpdateRoomType(UpdateRoomTypeDTO request)
+        {
+            //Creating a new UpdateRoomTypeResponseDTO object to store the response while updating the RoomType.
+            UpdateRoomTypeResponseDTO updateRoomTypeResponseDTO = new UpdateRoomTypeResponseDTO()
+            {
+                //Setting the RoomTypeId property of the response object.
+                RoomTypeId = request.RoomTypeID
+            };
+         
+            //Creating a new SqlConnection object using the CreateConnection method of SqlConnectionFactory.
+            using var connection = _connectionFactory.CreateConnection();
+            
+            //Creating a new SqlCommand object to execute the stored procedure spUpdateRoomType.
+            var command = new SqlCommand("spUpdateRoomType", connection)
+            {
+                //Setting the command type to stored procedure.
+                CommandType = CommandType.StoredProcedure
+            };
+            
+            //Adding the parameters to the command.
+            command.Parameters.Add(new SqlParameter("@RoomTypeID", request.RoomTypeID));
+            command.Parameters.Add(new SqlParameter("@TypeName", request.TypeName));
+            command.Parameters.Add(new SqlParameter("@AccessibilityFeatures", request.AccessibilityFeatures));
+            command.Parameters.Add(new SqlParameter("@Description", request.Description));
+            command.Parameters.Add(new SqlParameter("@ModifiedBy", "System"));
+            
+            //Adding the output parameters to the command.
+            var statusCode = new SqlParameter("@StatusCode", SqlDbType.Int)
+            {
+                //Setting the direction of the parameter to output.
+                Direction = ParameterDirection.Output
+            };
+            
+            //Adding the output parameters to the command.
+            var message = new SqlParameter("@Message", SqlDbType.NVarChar, 255)
+            {
+                //Setting the direction of the parameter to output.
+                Direction = ParameterDirection.Output
+            };
+            
+            //Adding the output parameters to the command.
+            command.Parameters.Add(statusCode);
+            command.Parameters.Add(message);
+            
+            //Trying to update the RoomType in the database.
+            try
+            {
+                //Opening the connection.
+                await connection.OpenAsync();
+
+                //Executing the command asynchronously to update the RoomType.
+                await command.ExecuteNonQueryAsync();
+            
+                //Setting the response properties using the output parameters.
+                updateRoomTypeResponseDTO.Message = message.Value.ToString();
+                updateRoomTypeResponseDTO.IsUpdated = (int)statusCode.Value == 0;
+                
+                //Returning the response.
+                return updateRoomTypeResponseDTO;
+            }
+            //Catching any SqlException that may occur during the RoomType update process.
+            catch (SqlException ex)
+            {
+                //Setting the response properties if an exception occurs.
+                updateRoomTypeResponseDTO.Message = ex.Message;
+
+                //Setting the response properties if the RoomType was not updated successfully.
+                updateRoomTypeResponseDTO.IsUpdated = false;
+                
+                //Returning the unsuccessful RoomType update response.
+                return updateRoomTypeResponseDTO;
             }
         }
     }
