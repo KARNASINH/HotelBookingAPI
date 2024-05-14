@@ -25,6 +25,8 @@ namespace HotelBookingAPI.Controllers
         }
 
 
+
+
         //API endpoint to get all the RoomTypes from the database based on the IsActive status.
         [HttpGet("AllRoomTypes")]
         public async Task<APIResponse<List<RoomTypeDTO>>> GetAllRoomTypes(bool? IsActive = null)
@@ -49,6 +51,42 @@ namespace HotelBookingAPI.Controllers
 
                 //Return the Internal server error response if any error occurs in the Try block.
                 return new APIResponse<List<RoomTypeDTO>>(HttpStatusCode.InternalServerError, "Internal server error: " + ex.Message);
+            }
+        }
+
+
+
+        //API endpoint to get the RoomType by RoomTypeID.
+        [HttpGet("GetRoomType/{RoomTypeID}")]
+        public async Task<APIResponse<RoomTypeDTO>> GetRoomTypeById(int RoomTypeID)
+        {
+            //Log the request received to get the RoomType by RoomTypeID.
+            _logger.LogInformation($"Request Received for GetRoomTypeById, RoomTypeID: {RoomTypeID}");
+
+            //Try to get the RoomType by RoomTypeID.
+            try
+            {
+                //Retrieve the RoomType by RoomTypeID using the RoomTypeRepository's RetrieveRoomTypeByIdAsync method.
+                var roomType = await _roomTypeRepository.RetrieveRoomTypeByIdAsync(RoomTypeID);
+
+                //Check if the RoomType is null.
+                if (roomType == null)
+                {
+                    //Return the Not Found response if the RoomType is not found along with 404 status code.
+                    return new APIResponse<RoomTypeDTO>(HttpStatusCode.NotFound, "RoomTypeID not found.");
+                }
+
+                //Return the RoomType if found.
+                return new APIResponse<RoomTypeDTO>(roomType, "RoomType fetched successfully.");
+            }
+            //Catch the exception if any error occurs.
+            catch (Exception ex)
+            {
+                //Log the error message if any error occurs during the Try block.
+                _logger.LogError(ex, "Error getting Room Type by ID {RoomTypeID}", RoomTypeID);
+
+                //Return the Bad Request response if any error occurs in the Try block along with 400 status code.
+                return new APIResponse<RoomTypeDTO>(HttpStatusCode.BadRequest, "Error fetching Room Type .", ex.Message);
             }
         }
     }
