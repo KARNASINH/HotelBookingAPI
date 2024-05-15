@@ -8,8 +8,6 @@ namespace HotelBookingAPI.DTOs.RoomDTOs
         //Room number
         [Required]
         [StringLength(10, ErrorMessage = "Room number must be up to 10 characters long.")]
-
-        //Room number
         public string RoomNumber { get; set; }
 
         //Room type ID, this is a foreign key
