@@ -2,7 +2,7 @@
 
 namespace HotelBookingAPI.DTOs.RoomDTOs
 {
-    //This class is used to hold the data that is sent to the API when creating a new room
+    //This class is used to hold the data for creating a new room
     public class CreateRoomRequestDTO
     {
         [Required]
