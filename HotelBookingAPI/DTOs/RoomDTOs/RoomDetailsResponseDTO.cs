@@ -1,0 +1,15 @@
+﻿namespace HotelBookingAPI.DTOs.RoomDTOs
+{
+    //This class is used to hold the information of a room to see the details of a room
+    public class RoomDetailsResponseDTO
+    {
+        public int RoomID { get; set; }
+        public string RoomNumber { get; set; }
+        public int RoomTypeID { get; set; }
+        public decimal Price { get; set; }
+        public string BedType { get; set; }
+        public string ViewType { get; set; }
+        public string Status { get; set; }
+        public bool IsActive { get; set; }
+    }
+}
