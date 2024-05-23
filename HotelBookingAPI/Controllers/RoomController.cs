@@ -218,6 +218,53 @@ namespace HotelBookingAPI.Controllers
                 return new APIResponse<UpdateRoomResponseDTO>(HttpStatusCode.InternalServerError, "Update Room Failed.", ex.Message);
             }
         }
+
+
+
+
+
+        //API Endpoint to delete a room
+        [HttpDelete("Delete/{id}")]
+        public async Task<APIResponse<DeleteRoomResponseDTO>> DeleteRoom(int id)
+        {
+            //Logging the request received
+            _logger.LogInformation($"Request Received for DeleteRoom, id: {id}");
+
+            //Try to delete the room
+            try
+            {
+                //Calling the DeleteRoomAsync method of RoomRepository to get the room id if present into the database
+                var room = await _roomRepository.GetRoomByIdAsync(id);
+
+                //Checking the room is in the database or not
+                if (room == null)
+                {
+                    //Returning the response with the 404 Http status code and the error message
+                    return new APIResponse<DeleteRoomResponseDTO>(HttpStatusCode.NotFound, "Room not found.");
+                }
+                //Calling the DeleteRoomAsync method of RoomRepository to delete the room
+                var response = await _roomRepository.DeleteRoomAsync(id);
+
+                //Checking if the room is deleted successfully
+                if (response.IsDeleted)
+                {
+                    //Returning the response with the 200 Http status code and the room data
+                    return new APIResponse<DeleteRoomResponseDTO>(response, response.Message);
+                }
+
+                //Returning the response with the 400 Http status code and the error message
+                return new APIResponse<DeleteRoomResponseDTO>(HttpStatusCode.BadRequest, response.Message);
+            }
+            //Catch the exception if any error occurs
+            catch (Exception ex)
+            {
+                //Logging the error if any error occurs in the try block
+                _logger.LogError(ex, "Error deleting Room {id}", id);
+
+                //Returning the response with the 500 Http status code and the error message
+                return new APIResponse<DeleteRoomResponseDTO>(HttpStatusCode.InternalServerError, "Internal server error: " + ex.Message);
+            }
+        }
     }
 
 }
