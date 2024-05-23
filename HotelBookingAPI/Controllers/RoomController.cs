@@ -162,6 +162,62 @@ namespace HotelBookingAPI.Controllers
 
 
 
+
+
+
+        //API Endpoint to update a room
+        [HttpPut("Update/{id}")]
+        public async Task<APIResponse<UpdateRoomResponseDTO>> UpdateRoom(int id, [FromBody] UpdateRoomRequestDTO request)
+        {
+            //Logging the request received
+            _logger.LogInformation("Request Received for UpdateRoom {@UpdateRoomRequestDTO}", request);
+
+            //Checking if the Data in the Request Body is valid and if model binding is successful or not
+            if (!ModelState.IsValid)
+            {
+                //Logging the error if the data in the Request Body is invalid
+                _logger.LogInformation("UpdateRoom Invalid Request Body");
+
+                //Returning the response with the 400 Http status code and the error message
+                return new APIResponse<UpdateRoomResponseDTO>(HttpStatusCode.BadRequest, "Invalid Request Body");
+            }
+
+            //Checking if the ID in the URL and the ID in the Request Body are same
+            if (id != request.RoomID)
+            {
+                //Logging the error if the ID in the URL and the ID in the Request Body are different
+                _logger.LogInformation("UpdateRoom Mismatched Room ID");
+
+                //Returning the response with the 400 Http status code and the error message
+                return new APIResponse<UpdateRoomResponseDTO>(HttpStatusCode.BadRequest, "Mismatched Room ID.");
+            }
+
+            //Try to update the room
+            try
+            {
+                //Calling the UpdateRoomAsync method of RoomRepository to update the room
+                var response = await _roomRepository.UpdateRoomAsync(request);
+
+                //Checks if the room is updated successfully
+                if (response.IsUpdated)
+                {
+                    //Returning the response with the 200 Http status code and the room data
+                    return new APIResponse<UpdateRoomResponseDTO>(response, response.Message);
+                }
+
+                //Returning the response with the 400 Http status code and the error message
+                return new APIResponse<UpdateRoomResponseDTO>(HttpStatusCode.BadRequest, response.Message);
+            }
+            //Catch the exception if any error occurs
+            catch (Exception ex)
+            {
+                //Logging the error if any error occurs in the try block
+                _logger.LogError(ex, "Error Updating Room {id}", id);
+
+                //Returning the response with the 500 Http status code and the error message
+                return new APIResponse<UpdateRoomResponseDTO>(HttpStatusCode.InternalServerError, "Update Room Failed.", ex.Message);
+            }
+        }
     }
 
 }
