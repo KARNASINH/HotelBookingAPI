@@ -36,6 +36,7 @@ namespace HotelBookingAPI.Controllers
 
 
 
+
         //API Endpoint to get all the rooms
         [HttpGet("All")]
         public async Task<APIResponse<List<RoomDetailsResponseDTO>>> GetAllRooms([FromQuery] GetAllRoomsRequestDTO request)
@@ -67,7 +68,7 @@ namespace HotelBookingAPI.Controllers
             {
                 _logger.LogError(ex, "Error Retriving all Room");
 
-                //Return Internal Server Error if any error occurs during the execion of the Action Method.
+                //Return Http 500 Internal Server Error if any error occurs during the execution of the Action Method.
                 return new APIResponse<List<RoomDetailsResponseDTO>>(HttpStatusCode.InternalServerError, "Internal server error: " + ex.Message);
             }
         }
@@ -76,6 +77,37 @@ namespace HotelBookingAPI.Controllers
 
 
 
+        //API Endpoint to get a room by ID
+        [HttpGet("{id}")]
+        public async Task<APIResponse<RoomDetailsResponseDTO>> GetRoomById(int id)
+        {
+            //Logging the message that request is received for GetRoomById with the ID
+            _logger.LogInformation($"Request Received for GetRoomById, id: {id}");
 
+            //Try to get the room by ID
+            try
+            {
+                //Calling the GetRoomByIdAsync method of RoomRepository to get the room by ID
+                var response = await _roomRepository.GetRoomByIdAsync(id);
+
+                //Checking if the response is null
+                if (response == null)
+                {
+                    //Returning the response with the 404 status code and the error message
+                    return new APIResponse<RoomDetailsResponseDTO>(HttpStatusCode.NotFound, "Room ID not found.");
+                }
+
+                //Returning the response with the 200 status code and the room data
+                return new APIResponse<RoomDetailsResponseDTO>(response, "Room fetched successfully.");
+            }
+            //Catch the exception if any error occurs
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting Room by ID {id}", id);
+
+                //Return Http 500 Internal Server Error if any error occurs during the execution of the Action Method.
+                return new APIResponse<RoomDetailsResponseDTO>(HttpStatusCode.InternalServerError, "Error fetching Room.", ex.Message);
+            }
+        }
     }
 }
