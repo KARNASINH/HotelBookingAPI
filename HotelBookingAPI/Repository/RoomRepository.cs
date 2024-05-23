@@ -142,5 +142,53 @@ namespace HotelBookingAPI.Repository
                 throw new Exception($"Error updating room: {ex.Message}", ex);
             }
         }
+
+
+
+
+        //This method is used to delete an existing room in the database using a stored procedure
+        public async Task<DeleteRoomResponseDTO> DeleteRoomAsync(int roomId)
+        {
+            //Create a new SqlConnection instance using the SqlConnectionFactory
+            using var connection = _connectionFactory.CreateConnection();
+
+            //Create a command to execute the stored procedure
+            using var command = new SqlCommand("spDeleteRoom", connection)
+            {
+                //Set the command type to stored procedure
+                CommandType = CommandType.StoredProcedure
+            };
+
+            //Add the parameter required by the stored procedure
+            command.Parameters.AddWithValue("@RoomID", roomId);
+
+            //Add the output parameters to retrieve the response data
+            command.Parameters.Add("@StatusCode", SqlDbType.Int).Direction = ParameterDirection.Output;
+            command.Parameters.Add("@Message", SqlDbType.NVarChar, 255).Direction = ParameterDirection.Output;
+
+            //Try to open the connection and execute the stored procedure
+            try
+            {
+                //Open the connection asynchronously
+                await connection.OpenAsync();
+
+                //Execute the stored procedure asynchronously
+                await command.ExecuteNonQueryAsync();
+
+                //Return the DeleteRoomResponseDTO object with the response data
+                return new DeleteRoomResponseDTO
+                {
+                    //Set the properties of the response object
+                    IsDeleted = (int)command.Parameters["@StatusCode"].Value == 0,
+                    Message = (string)command.Parameters["@Message"].Value
+                };
+            }
+            //Catch any exceptions that occur during the execution of Try block
+            catch (Exception ex)
+            {
+                //Throw a new exception with a custom message and the original exception
+                throw new Exception($"Error deleting room: {ex.Message}", ex);
+            }
+        }
     }
 }
