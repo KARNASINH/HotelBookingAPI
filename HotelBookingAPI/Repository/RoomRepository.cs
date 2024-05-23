@@ -146,6 +146,7 @@ namespace HotelBookingAPI.Repository
 
 
 
+
         //This method is used to delete an existing room in the database using a stored procedure
         public async Task<DeleteRoomResponseDTO> DeleteRoomAsync(int roomId)
         {
@@ -188,6 +189,66 @@ namespace HotelBookingAPI.Repository
             {
                 //Throw a new exception with a custom message and the original exception
                 throw new Exception($"Error deleting room: {ex.Message}", ex);
+            }
+        }
+
+
+
+
+
+        //This method is used to retrieve a room by its ID from the database using a stored procedure
+        public async Task<RoomDetailsResponseDTO> GetRoomByIdAsync(int roomId)
+        {
+            //Create a new SqlConnection instance using the SqlConnectionFactory
+            using var connection = _connectionFactory.CreateConnection();
+
+            //Create a command to execute the stored procedure
+            using var command = new SqlCommand("spGetRoomById", connection)
+            {
+                //Set the command type to stored procedure
+                CommandType = CommandType.StoredProcedure
+            };
+
+            //Add the parameter required by the stored procedure
+            command.Parameters.AddWithValue("@RoomID", roomId);
+
+            //Try to open the connection and execute the stored procedure
+            try
+            {
+                //Open the connection asynchronously
+                await connection.OpenAsync();
+
+                //Execute the stored procedure asynchronously
+                using var reader = await command.ExecuteReaderAsync();
+
+                //Check if the reader has any rows
+                if (await reader.ReadAsync())
+                {
+                    //Return a new RoomDetailsResponseDTO object with the data from the reader
+                    return new RoomDetailsResponseDTO
+                    {
+                        //Set the properties of the response object
+                        RoomID = reader.GetInt32("RoomID"),
+                        RoomNumber = reader.GetString("RoomNumber"),
+                        RoomTypeID = reader.GetInt32("RoomTypeID"),
+                        Price = reader.GetDecimal("Price"),
+                        BedType = reader.GetString("BedType"),
+                        ViewType = reader.GetString("ViewType"),
+                        Status = reader.GetString("Status"),
+                        IsActive = reader.GetBoolean("IsActive")
+                    };
+                }
+                //If the reader has no rows, return null
+                else
+                {
+                    return null;
+                }
+            }
+            //Catch any exceptions that occur during the execution of Try block
+            catch (Exception ex)
+            {
+                //Throw a new exception with a custom message and the original exception
+                throw new Exception($"Error retrieving room by ID: {ex.Message}", ex);
             }
         }
     }

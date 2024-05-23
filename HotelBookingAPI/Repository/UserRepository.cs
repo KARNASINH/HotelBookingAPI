@@ -229,23 +229,22 @@ namespace HotelBookingAPI.Repository
             using var reader = await command.ExecuteReaderAsync();
 
             //Read the data from the reader
-            if (!reader.Read())
+            if (await reader.ReadAsync())
             {
-                //Return null if the user is not found
+                //Create an instance of UserResponseDTO
+                return new UserResponseDTO
+                {
+                    //Set the properties of the UserResponseDTO
+                    UserID = reader.GetInt32("UserID"),
+                    Email = reader.GetString("Email"),
+                    IsActive = reader.GetBoolean("IsActive")
+                };
+            }
+            //If the reader has no rows, return null
+            else
+            {                  
                 return null;
             }
-
-            //Create an instance of UserResponseDTO
-            var user = new UserResponseDTO
-            {
-                //Set the properties of the UserResponseDTO
-                UserID = reader.GetInt32("UserID"),
-                Email = reader.GetString("Email"),
-                IsActive = reader.GetBoolean("IsActive")
-            };
-
-            //Return the User with data
-            return user;
         }
 
 
