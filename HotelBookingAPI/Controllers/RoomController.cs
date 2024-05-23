@@ -12,17 +12,17 @@ namespace HotelBookingAPI.Controllers
         //Repository object to access the methods of RoomRepository
         private readonly RoomRepository _roomRepository;
 
-        
-        
-        
-        
+
+
+
+
         //Logger object to log the exceptions
         private readonly ILogger<RoomController> _logger;
 
-        
-        
-        
-        
+
+
+
+
         //Constructor to initialize the RoomRepository and Logger objects
         public RoomController(RoomRepository roomRepository, ILogger<RoomController> logger)
         {
@@ -109,5 +109,59 @@ namespace HotelBookingAPI.Controllers
                 return new APIResponse<RoomDetailsResponseDTO>(HttpStatusCode.InternalServerError, "Error fetching Room.", ex.Message);
             }
         }
+
+
+
+
+
+        //API Endpoint to create a new room
+        [HttpPost("Create")]
+        public async Task<APIResponse<CreateRoomResponseDTO>> CreateRoom([FromBody] CreateRoomRequestDTO request)
+        {
+            //Logging the request received
+            _logger.LogInformation("Request Received for CreateRoom: {@CreateRoomRequestDTO}", request);
+
+            //Checking if the Data in the Request Body is valid and if model binding is successful or not
+            if (!ModelState.IsValid)
+            {
+                //Logging the error if the data in the Request Body is invalid
+                _logger.LogInformation("Invalid Data in the Request Body");
+
+                //Returning the response with the 400 Http status code and the error message
+                return new APIResponse<CreateRoomResponseDTO>(HttpStatusCode.BadRequest, "Invalid Data in the Requrest Body");
+            }
+            //Try to create a new room
+            try
+            {
+                //Calling the CreateRoomAsync method of RoomRepository to create a new room
+                var response = await _roomRepository.CreateRoomAsync(request);
+
+                //Logging the response received from the repository
+                _logger.LogInformation("CreateRoom Response From Repository: {@CreateRoomResponseDTO}", response);
+
+                //Checking if the room is created successfully
+                if (response.IsCreated)
+                {
+                    //Returning the response with the 200 Http status code and the room data
+                    return new APIResponse<CreateRoomResponseDTO>(response, response.Message);
+                }
+
+                //Returning the response with the 400 Http status code and the error message
+                return new APIResponse<CreateRoomResponseDTO>(HttpStatusCode.BadRequest, response.Message);
+            }
+            //Catch the exception if any error occurs
+            catch (Exception ex)
+            {
+                //Logging the error if any error occurs in the try block
+                _logger.LogError(ex, "Error adding new Room");
+
+                //Returning the response with the 500 Http status code and the error message
+                return new APIResponse<CreateRoomResponseDTO>(HttpStatusCode.InternalServerError, "Room Creation Failed.", ex.Message);
+            }
+        }
+
+
+
     }
+
 }
