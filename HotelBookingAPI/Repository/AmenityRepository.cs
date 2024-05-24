@@ -14,6 +14,7 @@ namespace HotelBookingAPI.Repository
 
 
 
+
         //Injecting SqlConnectionFactory object using DI.
         public AmenityRepository(SqlConnectionFactory connectionFactory)
         {
@@ -24,6 +25,7 @@ namespace HotelBookingAPI.Repository
 
 
 
+        
         //This method is used to fetch the details of the Amenity from the database.
         public async Task<List<AmenityDetailsDTO>> FetchAmenitiesAsync(bool? isActive)
         {
@@ -88,6 +90,7 @@ namespace HotelBookingAPI.Repository
 
 
 
+
         //This method is used to fetch the details of the Amenity by AmenityID from the database.
         public async Task<AmenityDetailsDTO?> FetchAmenityByIdAsync(int amenityId)
         {
@@ -136,6 +139,72 @@ namespace HotelBookingAPI.Repository
                 throw new Exception($"Error retrieving Amenity by ID: {ex.Message}", ex);
             }
 
+        }
+
+
+
+
+
+
+        //This method is used to add a new Amenity to the database.
+        public async Task<AmenityInsertResponseDTO> AddAmenityAsync(AmenityInsertDTO amenity)
+        {
+            //Creating AmenityInsertResponseDTO object to store the response of the AddAmenity operation.
+            AmenityInsertResponseDTO amenityInsertResponseDTO = new AmenityInsertResponseDTO();
+
+            //Creating SqlConnection object to establish connection with Database.
+            using var connection = _connectionFactory.CreateConnection();
+
+            //Creating SqlCommand object to execute the stored procedure spAddAmenity.
+            using var command = new SqlCommand("spAddAmenity", connection);
+
+            //Setting the CommandType of the SqlCommand object to StoredProcedure.
+            command.CommandType = CommandType.StoredProcedure;
+
+            //Adding parameters to the SqlCommand object.
+            command.Parameters.AddWithValue("@Name", amenity.Name);
+            command.Parameters.AddWithValue("@Description", amenity.Description);
+            command.Parameters.AddWithValue("@CreatedBy", "System");
+
+            //Creating SqlParameter object to get the output parameters from the stored procedure.
+            command.Parameters.Add("@AmenityID", SqlDbType.Int).Direction = ParameterDirection.Output;
+            command.Parameters.Add("@Status", SqlDbType.Bit).Direction = ParameterDirection.Output;
+            command.Parameters.Add("@Message", SqlDbType.NVarChar, 255).Direction = ParameterDirection.Output;
+
+            //Try block to catch any exceptions that occur during the execution of the code inside the block.
+            try
+            {
+                //Opening the connection with the Database.
+                await connection.OpenAsync();
+
+                //Executing the SqlCommand object to add a new Amenity to the database.
+                await command.ExecuteNonQueryAsync();
+
+                //Checking the status of the operation.
+                if (Convert.ToBoolean(command.Parameters["@Status"].Value))
+                {
+                    //Setting the response of the operation.
+                    amenityInsertResponseDTO.Message = Convert.ToString(command.Parameters["@Message"].Value);
+                    amenityInsertResponseDTO.IsCreated = true;
+                    amenityInsertResponseDTO.AmenityID = Convert.ToInt32(command.Parameters["@AmenityID"].Value);
+
+                    //Returning the response of the operation.
+                    return amenityInsertResponseDTO;
+                }
+
+                //Setting the response of the operation.
+                amenityInsertResponseDTO.Message = Convert.ToString(command.Parameters["@Message"].Value);
+                amenityInsertResponseDTO.IsCreated = false;
+
+                //Returning the response of the operation.
+                return amenityInsertResponseDTO;
+            }
+            //Catch any exceptions that occur during the execution of Try block
+            catch (SqlException ex)
+            {
+                //Throw a new exception with a custom message and the original exception
+                throw new Exception($"Error retrieving Amenity by ID: {ex.Message}", ex);
+            }
         }
 
     }
