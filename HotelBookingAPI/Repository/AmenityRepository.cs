@@ -200,7 +200,7 @@ namespace HotelBookingAPI.Repository
                 return amenityInsertResponseDTO;
             }
             //Catch any exceptions that occur during the execution of Try block
-            catch (SqlException ex)
+            catch (Exception ex)
             {
                 //Throw a new exception with a custom message and the original exception
                 throw new Exception($"Error while adding Amenity to the database : {ex.Message}", ex);
@@ -257,7 +257,7 @@ namespace HotelBookingAPI.Repository
                 return amenityUpdateResponseDTO;
             }
             //Catch any exceptions that occur during the execution of Try block
-            catch (SqlException ex)
+            catch (Exception ex)
             {
                 //Throw a new exception with a custom message and the original exception
                 throw new Exception($"Error while updating Amenity in the database : {ex.Message}", ex);
@@ -269,7 +269,47 @@ namespace HotelBookingAPI.Repository
 
 
 
+        //This method is used to delete an Amenity from the database.
+        public async Task<AmenityDeleteResponseDTO> DeleteAmenityAsync(int amenityId)
+        {
+            //Creating connection object to establish connection with Database.
+            using var connection = _connectionFactory.CreateConnection();
 
+            //Creating SqlCommand object to execute the stored procedure spDeleteAmenity.
+            using var command = new SqlCommand("spDeleteAmenity", connection);
+
+            //Setting the CommandType of the SqlCommand object to StoredProcedure.
+            command.CommandType = CommandType.StoredProcedure;
+
+            //Adding parameters to the SqlCommand object.
+            command.Parameters.AddWithValue("@AmenityID", amenityId);
+
+            //Creating SqlParameter object to get the output parameters from the stored procedure.
+            command.Parameters.Add("@Status", SqlDbType.Bit).Direction = ParameterDirection.Output;
+            command.Parameters.Add("@Message", SqlDbType.NVarChar, 255).Direction = ParameterDirection.Output;
+
+            //Try block to catch any exceptions that occur during the execution of the code inside the block.
+            try
+            {
+                //Opening the connection with the Database.
+                await connection.OpenAsync();
+                await command.ExecuteNonQueryAsync();
+
+                //Returning the response of the operation.
+                return new AmenityDeleteResponseDTO
+                {
+                    //Setting the properties in the response object
+                    IsDeleted = Convert.ToBoolean(command.Parameters["@Status"].Value),
+                    Message = command.Parameters["@Message"].Value.ToString()
+                };
+            }
+            //Catch any exceptions that occur during the execution of Try block
+            catch (Exception ex)
+            {
+                //Throw a new exception with a custom message and the original exception
+                throw new Exception($"Error while deleting Amenity from the database : {ex.Message}", ex);
+            }
+        }
 
     }
 }
