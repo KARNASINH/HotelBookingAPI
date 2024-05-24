@@ -203,7 +203,7 @@ namespace HotelBookingAPI.Repository
             catch (SqlException ex)
             {
                 //Throw a new exception with a custom message and the original exception
-                throw new Exception($"Error retrieving Amenity by ID: {ex.Message}", ex);
+                throw new Exception($"Error while adding Amenity to the database : {ex.Message}", ex);
             }
         }
 
