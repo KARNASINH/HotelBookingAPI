@@ -84,5 +84,59 @@ namespace HotelBookingAPI.Repository
             }
         }
 
+
+
+
+
+        //This method is used to fetch the details of the Amenity by AmenityID from the database.
+        public async Task<AmenityDetailsDTO?> FetchAmenityByIdAsync(int amenityId)
+        {
+            //Creating SqlConnection object to establish connection with Database.
+            using var connection = _connectionFactory.CreateConnection();
+
+            //Creating SqlCommand object to execute the stored procedure spFetchAmenityByID.
+            using var command = new SqlCommand("spFetchAmenityByID", connection);
+
+            //Setting the CommandType of the SqlCommand object to StoredProcedure.
+            command.CommandType = CommandType.StoredProcedure;
+
+            //Adding parameters to the SqlCommand object.
+            command.Parameters.AddWithValue("@AmenityID", amenityId);
+
+            //Try block to catch any exceptions that occur during the execution of the code inside the block.
+            try
+            {
+                //Creating SqlParameter object to get the output parameters from the stored procedure.
+                await connection.OpenAsync();
+
+                //Executing the SqlCommand object to fetch the details of the Amenity by AmenityID from the database.
+                var reader = await command.ExecuteReaderAsync();
+
+                //Reading the data from the SqlDataReader object.
+                if (await reader.ReadAsync())
+                {
+                    //Returning the AmenityDetailsDTO object.
+                    return new AmenityDetailsDTO
+                    {
+                        AmenityID = reader.GetInt32(reader.GetOrdinal("AmenityID")),
+                        Name = reader.GetString(reader.GetOrdinal("Name")),
+                        Description = reader.GetString(reader.GetOrdinal("Description")),
+                        IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive"))
+                    };
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            //Catch any exceptions that occur during the execution of Try block
+            catch (Exception ex)
+            {
+                //Throw a new exception with a custom message and the original exception
+                throw new Exception($"Error retrieving Amenity by ID: {ex.Message}", ex);
+            }
+
+        }
+
     }
 }

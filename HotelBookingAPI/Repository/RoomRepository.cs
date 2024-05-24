@@ -199,7 +199,7 @@ namespace HotelBookingAPI.Repository
 
 
         //This method is used to retrieve a room by its ID from the database using a stored procedure
-        public async Task<RoomDetailsResponseDTO> GetRoomByIdAsync(int roomId)
+        public async Task<RoomDetailsResponseDTO?> GetRoomByIdAsync(int roomId)
         {
             //Create a new SqlConnection instance using the SqlConnectionFactory
             using var connection = _connectionFactory.CreateConnection();
