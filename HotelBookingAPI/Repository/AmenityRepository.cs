@@ -207,5 +207,69 @@ namespace HotelBookingAPI.Repository
             }
         }
 
+
+
+
+
+        //This method is used to update the details of an Amenity in the database.
+        public async Task<AmenityUpdateResponseDTO> UpdateAmenityAsync(AmenityUpdateDTO amenity)
+        {
+            //Creating AmenityUpdateResponseDTO object to store the response of the UpdateAmenity operation.
+            AmenityUpdateResponseDTO amenityUpdateResponseDTO = new AmenityUpdateResponseDTO()
+            {
+                AmenityID = amenity.AmenityID
+            };
+
+            //Creating SqlConnection object to establish connection with Database.
+            using var connection = _connectionFactory.CreateConnection();
+
+            //Creating SqlCommand object to execute the stored procedure spUpdateAmenity.
+            using var command = new SqlCommand("spUpdateAmenity", connection);
+
+            //Setting the CommandType of the SqlCommand object to StoredProcedure.
+            command.CommandType = CommandType.StoredProcedure;
+
+            //Adding parameters to the SqlCommand object.
+            command.Parameters.AddWithValue("@AmenityID", amenity.AmenityID);
+            command.Parameters.AddWithValue("@Name", amenity.Name);
+            command.Parameters.AddWithValue("@Description", amenity.Description);
+            command.Parameters.AddWithValue("@IsActive", amenity.IsActive);
+            command.Parameters.AddWithValue("@ModifiedBy", "System"); // Assume modified by system or pass a real user
+
+            //Creating SqlParameter object to get the output parameters from the stored procedure.
+            command.Parameters.Add("@Status", SqlDbType.Bit).Direction = ParameterDirection.Output;
+            command.Parameters.Add("@Message", SqlDbType.NVarChar, 255).Direction = ParameterDirection.Output;
+
+            //Try block to catch any exceptions that occur during the execution of the code inside the block.
+            try
+            {
+                //Opening the connection with the Database.
+                await connection.OpenAsync();
+
+                //Executing the SqlCommand object to update the details of the Amenity in the database.
+                await command.ExecuteNonQueryAsync();
+
+                //Updating the response of the operation.
+                amenityUpdateResponseDTO.Message = command.Parameters["@Message"].Value.ToString();
+                amenityUpdateResponseDTO.IsUpdated = Convert.ToBoolean(command.Parameters["@Status"].Value);
+
+                //Returning the response of the operation.
+                return amenityUpdateResponseDTO;
+            }
+            //Catch any exceptions that occur during the execution of Try block
+            catch (SqlException ex)
+            {
+                //Throw a new exception with a custom message and the original exception
+                throw new Exception($"Error while updating Amenity in the database : {ex.Message}", ex);
+            }
+        }
+
+
+
+
+
+
+
+
     }
 }
