@@ -27,7 +27,7 @@ namespace HotelBookingAPI.Repository
 
         
         //This method is used to fetch the details of the Amenity from the database.
-        public async Task<List<AmenityDetailsDTO>> FetchAmenitiesAsync(bool? isActive)
+        public async Task<AmenityFetchResultDTO> FetchAmenitiesAsync(bool? isActive)
         {
             //Creating SqlConnection object to establish connection with Database.
             using var connection = _connectionFactory.CreateConnection();
@@ -75,7 +75,12 @@ namespace HotelBookingAPI.Repository
                 }
 
                 //Returning the list of AmenityDetailsDTO object.
-                return amenities;
+                return new AmenityFetchResultDTO
+                {
+                    Amenities = amenities,
+                    IsSuccess = Convert.ToBoolean(statusCode.Value),
+                    Message = message.Value.ToString()
+                };
 
             }
             //Catching the exception if any error occurs while fetching the details of the Amenity from the database.
