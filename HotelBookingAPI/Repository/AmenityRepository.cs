@@ -372,5 +372,70 @@ namespace HotelBookingAPI.Repository
             }
         }
 
+
+
+
+
+        //This method is used to bulk update amenities in the database.
+        public async Task<AmenityBulkOperationResultDTO> BulkUpdateAmenitiesAsync(List<AmenityUpdateDTO> amenities)
+        {
+            //Creating connection object to establish connection with Database.
+            using var connection = _connectionFactory.CreateConnection();
+            //Creating SqlCommand object to execute the stored procedure spBulkUpdateAmenities.
+            using var command = new SqlCommand("spBulkUpdateAmenities", connection);
+        
+            //Setting the CommandType of the SqlCommand object to StoredProcedure.
+            command.CommandType = CommandType.StoredProcedure;
+            
+            //Creating DataTable object to store the amenities.
+            var amenitiesTable = new DataTable();
+            
+            //Adding columns to the DataTable object.
+            amenitiesTable.Columns.Add("AmenityID", typeof(int));
+            amenitiesTable.Columns.Add("Name", typeof(string));
+            amenitiesTable.Columns.Add("Description", typeof(string));
+            amenitiesTable.Columns.Add("IsActive", typeof(bool));
+            
+            //Adding rows to the DataTable object using foreach loop.
+            foreach (var amenity in amenities)
+            {
+                //Adding rows to the DataTable object.
+                amenitiesTable.Rows.Add(amenity.AmenityID, amenity.Name, amenity.Description, amenity.IsActive);
+            }
+            
+            //Passing the DataTable object as a parameter for the stored procedure's input parameter.
+            var param = command.Parameters.AddWithValue("@AmenityUpdates", amenitiesTable);
+            //Setting the SqlDbType of the parameter to Structured.
+            param.SqlDbType = SqlDbType.Structured;
+            
+            //Creating SqlParameter object to get the output parameters from the stored procedure.
+            command.Parameters.Add("@Status", SqlDbType.Bit).Direction = ParameterDirection.Output;
+            command.Parameters.Add("@Message", SqlDbType.NVarChar, 255).Direction = ParameterDirection.Output;
+            
+            //Try block to catch any exceptions that occur during the execution of the code inside the block.
+            try
+            {
+                //Opening the connection with the Database.
+                await connection.OpenAsync();
+                //Executing Stored Procedure to update amenities in the database.
+                await command.ExecuteNonQueryAsync();
+            
+                //Returning the response of the operation.
+                return new AmenityBulkOperationResultDTO
+                {
+                    //Setting the properties.
+                    IsSuccess = Convert.ToBoolean(command.Parameters["@Status"].Value),
+                    Message = command.Parameters["@Message"].Value.ToString()
+                };
+            }
+            //Catch any exceptions that occur during the execution of Try block
+            catch (Exception ex)
+            {
+                //Throw a new exception with a custom message and the original exception
+                throw new Exception($"Error while bulk updating amenities in the database : {ex.Message}", ex);
+            }
+
+        }
+
     }
 }
