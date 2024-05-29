@@ -315,6 +315,7 @@ namespace HotelBookingAPI.Repository
 
 
 
+        
         //This method is used to bulk insert amenities into the database.
         public async Task<AmenityBulkOperationResultDTO> BulkInsertAmenitiesAsync(List<AmenityInsertDTO> amenities)
         {
@@ -376,6 +377,7 @@ namespace HotelBookingAPI.Repository
 
 
 
+        
         //This method is used to bulk update amenities in the database.
         public async Task<AmenityBulkOperationResultDTO> BulkUpdateAmenitiesAsync(List<AmenityUpdateDTO> amenities)
         {
@@ -436,6 +438,13 @@ namespace HotelBookingAPI.Repository
             }
 
         }
+
+
+
+
+
+
+
 
     }
 }

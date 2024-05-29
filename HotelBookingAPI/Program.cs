@@ -24,6 +24,7 @@ builder.Services.AddTransient<SqlConnectionFactory>();
 //Add services to the container.
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<RoomRepository>();
+builder.Services.AddScoped<AmenityRepository>();
 
 var app = builder.Build();
 
