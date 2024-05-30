@@ -162,5 +162,50 @@ namespace HotelBookingAPI.Repository
                 Message = (string)messageParam.Value
             };
         }
+
+
+
+
+
+
+
+
+        //This method is used to delete a RoomAmenity from the database.
+        public async Task<RoomAmenityResponseDTO> DeleteRoomAmenityAsync(RoomAmenityDTO input)
+        {
+            //Creating a connection object using the CreateConnection method from the SqlConnectionFactory class.
+            using var connection = _connectionFactory.CreateConnection();
+
+            //Creating a command object to execute the stored procedure spDeleteRoomAmenity.
+            using var command = new SqlCommand("spDeleteSingleRoomAmenity", connection)
+            {
+                //Setting the command type to stored procedure.
+                CommandType = CommandType.StoredProcedure
+            };
+
+            //Adding the RoomTypeID and AmenityID as parameters to the command object.
+            command.Parameters.AddWithValue("@RoomTypeID", input.RoomTypeID);
+            command.Parameters.AddWithValue("@AmenityID", input.AmenityID);
+
+            //Adding the output parameters to the command object.
+            var statusParam = new SqlParameter("@Status", SqlDbType.Bit) { Direction = ParameterDirection.Output };
+            var messageParam = new SqlParameter("@Message", SqlDbType.NVarChar, 255) { Direction = ParameterDirection.Output };
+
+            //Adding the output parameters to the command object.
+            command.Parameters.Add(statusParam);
+            command.Parameters.Add(messageParam);
+
+            //Opening the connection.
+            await connection.OpenAsync();
+            await command.ExecuteNonQueryAsync();
+
+            //Returning the response from the database.
+            return new RoomAmenityResponseDTO
+            {
+                //Setting up the properties of the response object.
+                IsSuccess = (bool)statusParam.Value,
+                Message = (string)messageParam.Value
+            };
+        }
     }
 }
