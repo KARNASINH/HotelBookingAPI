@@ -203,5 +203,51 @@ namespace HotelBookingAPI.Controllers
                 return new APIResponse<AmenityUpdateResponseDTO>(HttpStatusCode.InternalServerError, "An error occurred while processing your request.", ex.Message);
             }
         }
+
+
+
+
+
+
+        //API endpoint to delete the amenity.
+        [HttpDelete("Delete/{id}")]
+        public async Task<APIResponse<AmenityDeleteResponseDTO>> DeleteAmenity(int id)
+        {
+            //Try block to delete the amenity.
+            try
+            {
+                //Calling the FetchAmenityByIdAsync method from the repository to delete the amenity by ID.
+                var amenity = await _amenityRepository.FetchAmenityByIdAsync(id);
+
+                //Checking if the amenity is not null.
+                if (amenity == null)
+                {
+                    //Returning the error message along with 404 HttpStatusCode.
+                    return new APIResponse<AmenityDeleteResponseDTO>(HttpStatusCode.NotFound, "Amenity not found.");
+                }
+
+                //Calling the DeleteAmenityAsync method from the repository to delete the amenity.
+                var response = await _amenityRepository.DeleteAmenityAsync(id);
+
+                //Checking if the amenity is deleted successfully.
+                if (response.IsDeleted)
+                {
+                    //Returning the data along with 200 HttpStatusCode.
+                    return new APIResponse<AmenityDeleteResponseDTO>(response, response.Message);
+                }
+
+                //Returning the error message along with 400 HttpStatusCode.
+                return new APIResponse<AmenityDeleteResponseDTO>(HttpStatusCode.BadRequest, response.Message);
+            }
+            //Catch block to handle the exception.
+            catch (Exception ex)
+            {
+                //Logging the error message.
+                _logger.LogError(ex, "Error occurred while deleting amenity.");
+
+                //Returning the error message along with 500 HttpStatusCode.
+                return new APIResponse<AmenityDeleteResponseDTO>(HttpStatusCode.InternalServerError, "An error occurred while processing your request.", ex.Message);
+            }
+        }
     }
 }
