@@ -148,5 +148,60 @@ namespace HotelBookingAPI.Controllers
                 return new APIResponse<AmenityInsertResponseDTO>(HttpStatusCode.InternalServerError, "Amenity Creation Failed.", ex.Message);
             }
         }
+
+
+
+
+
+
+
+        //API endpoint to update the amenity.
+        [HttpPut("Update/{id}")]
+        public async Task<APIResponse<AmenityUpdateResponseDTO>> UpdateAmenity(int id, [FromBody] AmenityUpdateDTO amenity)
+        {
+            //Try block to update the amenity.
+            try
+            {
+                //Checking if the ID in the request body and the ID in the URL are same.
+                if (id != amenity.AmenityID)
+                {
+                    //Log the error message if the ID in the request body and the ID in the URL are not same.
+                    _logger.LogInformation("UpdateRoom Mismatched Amenity ID");
+
+                    //Returning the error message along with 400 HttpStatusCode.
+                    return new APIResponse<AmenityUpdateResponseDTO>(HttpStatusCode.BadRequest, "Mismatched Amenity ID.");
+                }
+
+                //Checking if the model state is not valid.
+                if (!ModelState.IsValid)
+                {
+                    //Returning the error message along with 400 HttpStatusCode if the model state is not valid.
+                    return new APIResponse<AmenityUpdateResponseDTO>(HttpStatusCode.BadRequest, "Invalid Request Body");
+                }
+
+                //Calling the UpdateAmenityAsync method from the repository to update the amenity.
+                var response = await _amenityRepository.UpdateAmenityAsync(amenity);
+
+                //Checking if the amenity is updated successfully.
+                if (response.IsUpdated)
+                {
+                    //Returning the data along with 200 HttpStatusCode.
+                    return new APIResponse<AmenityUpdateResponseDTO>(response, response.Message);
+                }
+
+                //Returning the error message along with 400 HttpStatusCode.
+                return new APIResponse<AmenityUpdateResponseDTO>(HttpStatusCode.BadRequest, response.Message);
+            }
+
+            //Catch block to handle the exception.
+            catch (Exception ex)
+            {
+                //Logging the error message.
+                _logger.LogError(ex, "Error occurred while updating amenity.");
+
+                //Returning the error message along with 500 HttpStatusCode.
+                return new APIResponse<AmenityUpdateResponseDTO>(HttpStatusCode.InternalServerError, "An error occurred while processing your request.", ex.Message);
+            }
+        }
     }
 }
