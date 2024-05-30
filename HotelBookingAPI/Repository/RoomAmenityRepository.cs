@@ -27,7 +27,7 @@ namespace HotelBookingAPI.Repository
 
 
 
-        //Fetch All Amenities Based on the given RoomTypeID
+        //This method is used to fetch all the amenities based on  RoomTypeID from the database.
         public async Task<List<AmenityResponseDTO>> FetchRoomAmenitiesByRoomTypeIdAsync(int roomTypeId)
         {
             //Creating a list of AmenityResponseDTO to store the response from the database.
@@ -68,5 +68,14 @@ namespace HotelBookingAPI.Repository
             //Returning the response list.
             return response;
         }
+
+
+
+
+
+
+
+
+
     }
 }
