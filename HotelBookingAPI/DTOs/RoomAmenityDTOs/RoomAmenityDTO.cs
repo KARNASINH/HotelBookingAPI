@@ -2,6 +2,7 @@
 
 namespace HotelBookingAPI.DTOs.RoomAmenityDTOs
 {
+    //This class is used to hold the RoomAmenity.
     public class RoomAmenityDTO
     {
         [Required]
