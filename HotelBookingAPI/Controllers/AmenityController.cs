@@ -104,5 +104,49 @@ namespace HotelBookingAPI.Controllers
                 return new APIResponse<AmenityDetailsDTO>(HttpStatusCode.InternalServerError, "An error occurred while processing your request.", ex.Message);
             }
         }
+
+
+
+
+
+
+
+        //API endpoint to create the amenity.
+        [HttpPost("Add")]
+        public async Task<APIResponse<AmenityInsertResponseDTO>> AddAmenity([FromBody] AmenityInsertDTO amenity)
+        {
+            //Try block to add the amenity.
+            try
+            {
+                //Checking if the model state is not valid.
+                if (!ModelState.IsValid)
+                {
+                    //Returning the error message along with 400 HttpStatusCode if the model state is not valid.
+                    return new APIResponse<AmenityInsertResponseDTO>(HttpStatusCode.BadRequest, "Invalid Data in the Requrest Body");
+                }
+
+                //Calling the AddAmenityAsync method from the repository to add the amenity.
+                var response = await _amenityRepository.AddAmenityAsync(amenity);
+
+                //Checking if the amenity is created successfully.
+                if (response.IsCreated)
+                {
+                    //Returning the data along with 200 HttpStatusCode.
+                    return new APIResponse<AmenityInsertResponseDTO>(response, response.Message);
+                }
+
+                //Returning the error message along with 400 HttpStatusCode.
+                return new APIResponse<AmenityInsertResponseDTO>(HttpStatusCode.BadRequest, response.Message);
+            }
+            //Catch block to handle the exception.
+            catch (Exception ex)
+            {
+                //Logging the error message.
+                _logger.LogError(ex, "Error occurred while adding amenity.");
+
+                //Returning the error message along with 500 HttpStatusCode.
+                return new APIResponse<AmenityInsertResponseDTO>(HttpStatusCode.InternalServerError, "Amenity Creation Failed.", ex.Message);
+            }
+        }
     }
 }
