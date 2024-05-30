@@ -209,6 +209,7 @@ namespace HotelBookingAPI.Controllers
 
 
 
+
         //API endpoint to delete the amenity.
         [HttpDelete("Delete/{id}")]
         public async Task<APIResponse<AmenityDeleteResponseDTO>> DeleteAmenity(int id)
@@ -247,6 +248,49 @@ namespace HotelBookingAPI.Controllers
 
                 //Returning the error message along with 500 HttpStatusCode.
                 return new APIResponse<AmenityDeleteResponseDTO>(HttpStatusCode.InternalServerError, "An error occurred while processing your request.", ex.Message);
+            }
+        }
+
+
+
+
+
+
+        //API endpoint to bulk update the amenities.
+        [HttpPost("BulkUpdate")]
+        public async Task<APIResponse<AmenityBulkOperationResultDTO>> BulkUpdateAmenities(List<AmenityUpdateDTO> amenities)
+        {
+            //Try block to bulk update the amenities.
+            try
+            {
+                //Checking if the model state is not valid.
+                if (!ModelState.IsValid)
+                {
+                    //Returning the error message along with 400 HttpStatusCode if the model state is not valid.
+                    return new APIResponse<AmenityBulkOperationResultDTO>(HttpStatusCode.BadRequest, "Invalid Data in the Request Body");
+                }
+
+                //Calling the BulkUpdateAmenitiesAsync method from the repository to bulk update the amenities.
+                var response = await _amenityRepository.BulkUpdateAmenitiesAsync(amenities);
+
+                //Checking if the response returned after bulk updating the amenities is successful.
+                if (response.IsSuccess)
+                {
+                    //Returning the data along with 200 HttpStatusCode.
+                    return new APIResponse<AmenityBulkOperationResultDTO>(response, response.Message);
+                }
+
+                //Returning the error message along with 400 HttpStatusCode.
+                return new APIResponse<AmenityBulkOperationResultDTO>(HttpStatusCode.BadRequest, response.Message);
+            }
+            //Catch block to handle the exception.
+            catch (Exception ex)
+            {
+                //Logging the error message.
+                _logger.LogError(ex, "Error occurred while bulk updating amenities.");
+
+                //Returning the error message along with 500 HttpStatusCode.
+                return new APIResponse<AmenityBulkOperationResultDTO>(HttpStatusCode.InternalServerError, "An error occurred while processing your request.", ex.Message);
             }
         }
     }
