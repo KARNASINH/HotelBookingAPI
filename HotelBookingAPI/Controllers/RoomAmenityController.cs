@@ -343,4 +343,3 @@ namespace HotelBookingAPI.Controllers
     }
 
 }
-}
