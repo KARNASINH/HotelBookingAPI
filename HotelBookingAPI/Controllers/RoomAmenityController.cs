@@ -68,6 +68,8 @@ namespace HotelBookingAPI.Controllers
 
 
 
+
+
         //This Endpoint is responsible for fetching all the RoomTypes based on the given Amenity ID.
         [HttpGet("FetchRoomTypesByAmenityId/{amenityId}")]
         public async Task<APIResponse<List<RoomTypeResponse>>> FetchRoomTypesByAmenityId(int amenityId)
@@ -96,6 +98,50 @@ namespace HotelBookingAPI.Controllers
 
                 //Returning the error message along with 500 HttpStatusCode.
                 return new APIResponse<List<RoomTypeResponse>>(HttpStatusCode.InternalServerError, "Error fetching room types by amenity ID", ex.Message);
+            }
+        }
+
+
+
+
+
+
+
+        //This Endpoint is responsible for adding a new RoomAmenity.
+        [HttpPost("AddRoomAmenity")]
+        public async Task<APIResponse<RoomAmenityResponseDTO>> AddRoomAmenity([FromBody] RoomAmenityDTO input)
+        {
+            //Try block to add a new RoomAmenity.
+            try
+            {
+                //If the ModelState is not valid, then return the message Invalid Data in the Request Body along with 400 HttpStatusCode.
+                if (!ModelState.IsValid)
+                {
+                    //Returning the message along with 400 HttpStatusCode.
+                    return new APIResponse<RoomAmenityResponseDTO>(HttpStatusCode.BadRequest, "Invalid Data in the Request Body");
+                }
+
+                //Adding the RoomAmenity using AddRoomAmenityAsync method of RoomAmenityRepository class.
+                var response = await _roomAmenityRepository.AddRoomAmenityAsync(input);
+
+                //If the response is successful, then return the response.
+                if (response.IsSuccess)
+                {
+                    //Returning the RoomAmenityResponseDTO along with 200 HttpStatusCode.
+                    return new APIResponse<RoomAmenityResponseDTO>(response, response.Message);
+                }
+
+                //If the response is not successful, then return the message along with 400 HttpStatusCode.
+                return new APIResponse<RoomAmenityResponseDTO>(HttpStatusCode.BadRequest, response.Message);
+            }
+            //Catch block to handle the exception.
+            catch (Exception ex)
+            {
+                //Logging the error message.
+                _logger.LogError(ex, "Error adding room amenity");
+
+                //Returning the error message along with 500 HttpStatusCode.
+                return new APIResponse<RoomAmenityResponseDTO>(HttpStatusCode.InternalServerError, "Error adding room amenity", ex.Message);
             }
         }
 
