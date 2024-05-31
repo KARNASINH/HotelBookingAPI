@@ -63,5 +63,41 @@ namespace HotelBookingAPI.Controllers
             }
         }
 
+
+
+
+
+
+        //This Endpoint is responsible for fetching all the RoomTypes based on the given Amenity ID.
+        [HttpGet("FetchRoomTypesByAmenityId/{amenityId}")]
+        public async Task<APIResponse<List<RoomTypeResponse>>> FetchRoomTypesByAmenityId(int amenityId)
+        {
+            //Try block to fetch the RoomTypes based on the given Amenity ID.
+            try
+            {
+                //Fetching the RoomTypes using FetchRoomTypesByAmenityIdAsync of RoomAmenityRepository.
+                var roomTypes = await _roomAmenityRepository.FetchRoomTypesByAmenityIdAsync(amenityId);
+
+                //If roomTypes are not null and count is greater than 0, then return the roomTypes.
+                if (roomTypes != null && roomTypes.Count > 0)
+                {
+                    //Returning the List of RoomType along with 200 HttpStatusCode.
+                    return new APIResponse<List<RoomTypeResponse>>(roomTypes, "Fetch Room Types By AmenityId Successfully.");
+                }
+
+                //If roomTypes are null or count is 0, then return message No Record Found along with 400 HttpStatusCode.
+                return new APIResponse<List<RoomTypeResponse>>(HttpStatusCode.NotFound, "No Record Found");
+            }
+            //Catch block to handle the exception.
+            catch (Exception ex)
+            {
+                //Logging the error message.
+                _logger.LogError(ex, "Error fetching room types by amenity ID");
+
+                //Returning the error message along with 500 HttpStatusCode.
+                return new APIResponse<List<RoomTypeResponse>>(HttpStatusCode.InternalServerError, "Error fetching room types by amenity ID", ex.Message);
+            }
+        }
+
     }
 }
