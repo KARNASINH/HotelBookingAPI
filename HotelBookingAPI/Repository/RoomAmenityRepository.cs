@@ -207,5 +207,90 @@ namespace HotelBookingAPI.Repository
                 Message = (string)messageParam.Value
             };
         }
+
+
+
+
+
+
+
+        //This method is used to update bulk RoomAmenities in the database. 
+        //E.g. One RoomTypeID with many AmenityIDs
+        public async Task<RoomAmenityResponseDTO> BulkInsertRoomAmenitiesAsync(RoomAmenitiesBulkInsertUpdateDTO input)
+        {
+            //Creating a connection object using the CreateConnection method from the SqlConnectionFactory class.
+            using var connection = _connectionFactory.CreateConnection();
+
+            //Creating a command object to execute the stored procedure spBulkInsertRoomAmenities.
+            using var command = new SqlCommand("spBulkInsertRoomAmenities", connection)
+            {
+                //Setting the command type to stored procedure.
+                CommandType = CommandType.StoredProcedure
+            };
+
+            //Adding the RoomTypeID and AmenityIDs as parameters to the command object.
+            command.Parameters.AddWithValue("@RoomTypeID", input.RoomTypeID);
+
+            //Adding the AmenityIDs as a table-valued parameter to the command object.
+            command.Parameters.Add(CreateAmenityIDTableParameter(input.AmenityIDs));
+
+            //Adding the output parameters to the command object.
+            var statusParam = new SqlParameter("@Status", SqlDbType.Bit) { Direction = ParameterDirection.Output };
+
+            //Adding the output parameters to the command object.
+            var messageParam = new SqlParameter("@Message", SqlDbType.NVarChar, 255) { Direction = ParameterDirection.Output };
+
+            //Adding the output parameters to the command object.
+            command.Parameters.Add(statusParam);
+            command.Parameters.Add(messageParam);
+
+            //Opening the connection.
+            await connection.OpenAsync();
+
+            //Executing the command.
+            await command.ExecuteNonQueryAsync();
+
+            //Returning the response from the database.
+            return new RoomAmenityResponseDTO
+            {
+                //Setting up the properties of the response object.
+                IsSuccess = (bool)statusParam.Value,
+                Message = (string)messageParam.Value
+            };
+        }
+
+
+
+
+        
+        //This is a Helper method to create a SQL parameter for table-valued parameters
+        private SqlParameter CreateAmenityIDTableParameter(IEnumerable<int> amenityIds)
+        {
+            //Creating a DataTable to store the AmenityIDs.
+            var table = new DataTable();
+
+            //Adding a column to the DataTable.
+            table.Columns.Add("AmenityID", typeof(int));
+
+            //Adding the AmenityIDs to the DataTable.
+            foreach (var id in amenityIds)
+            {
+                //Adding a row to the DataTable.
+                table.Rows.Add(id);
+            }
+
+            //Creating a SQL parameter for the table-valued parameter.
+            var param = new SqlParameter
+            {
+                //Setting the parameter name, type, value, and type name.
+                ParameterName = "@AmenityIDs",
+                SqlDbType = SqlDbType.Structured,
+                Value = table,
+                TypeName = "AmenityIDTableType"
+            };
+
+            //Returning the SQL parameter.
+            return param;
+        }
     }
 }
