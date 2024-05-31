@@ -145,5 +145,49 @@ namespace HotelBookingAPI.Controllers
             }
         }
 
+
+
+
+
+
+
+        //This Endpoint is responsible for Deleting an existing RoomAmenity.
+        [HttpDelete("DeleteRoomAmenity")]
+        public async Task<APIResponse<RoomAmenityResponseDTO>> DeleteRoomAmenity([FromBody] RoomAmenityDTO input)
+        {
+            //Try block to delete an existing RoomAmenity.
+            try
+            {
+                //If the ModelState is not valid, then return the message Invalid Data in the Request Body along with 400 HttpStatusCode.
+                if (!ModelState.IsValid)
+                {
+                    //Returning the message along with 400 HttpStatusCode.
+                    return new APIResponse<RoomAmenityResponseDTO>(HttpStatusCode.BadRequest, "Invalid Data in the Request Body");
+                }
+
+                //Deleting the RoomAmenity using DeleteRoomAmenityAsync method of RoomAmenityRepository class.
+                var response = await _roomAmenityRepository.DeleteRoomAmenityAsync(input);
+
+                //If the response is successful, then return the response.
+                if (response.IsSuccess)
+                {
+                    //Returning the RoomAmenityResponseDTO along with 200 HttpStatusCode.
+                    return new APIResponse<RoomAmenityResponseDTO>(response, response.Message);
+                }
+
+                //If the response is not successful, then return the message along with 400 HttpStatusCode.
+                return new APIResponse<RoomAmenityResponseDTO>(HttpStatusCode.BadRequest, response.Message);
+            }
+            //Catch block to handle the exception.
+            catch (Exception ex)
+            {
+                //Logging the error message.
+                _logger.LogError(ex, "Error deleting room amenity");
+
+                //Returning the error message along with 500 HttpStatusCode.
+                return new APIResponse<RoomAmenityResponseDTO>(HttpStatusCode.InternalServerError, "Error deleting room amenity", ex.Message);
+            }
+        }
+
     }
 }
