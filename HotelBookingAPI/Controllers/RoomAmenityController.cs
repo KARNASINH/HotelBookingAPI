@@ -268,5 +268,41 @@ namespace HotelBookingAPI.Controllers
             }
         }
 
+
+
+
+
+
+        //This Endpoint is responsible for deleting all the RoomAmenities based on the given RoomType ID.
+        [HttpPost("DeleteAllRoomAmenitiesByRoomTypeID/{roomTypeId}")]
+        public async Task<APIResponse<RoomAmenityResponseDTO>> DeleteAllRoomAmenitiesByRoomTypeID(int roomTypeId)
+        {
+            //Try block to delete all the RoomAmenities based on the given RoomType ID.
+            try
+            {
+                //Deleting all the RoomAmenities using DeleteAllRoomAmenitiesByRoomTypeIDAsync method of RoomAmenityRepository class.
+                var response = await _roomAmenityRepository.DeleteAllRoomAmenitiesByRoomTypeIDAsync(roomTypeId);
+
+                //If the response is successful, then return the response.
+                if (response.IsSuccess)
+                {
+                    //Returning the RoomAmenityResponseDTO along with 200 HttpStatusCode.
+                    return new APIResponse<RoomAmenityResponseDTO>(response, response.Message);
+                }
+
+                //If the response is not successful, then return the message along with 400 HttpStatusCode.
+                return new APIResponse<RoomAmenityResponseDTO>(HttpStatusCode.BadRequest, response.Message);
+            }
+            //Catch block to handle the exception.
+            catch (Exception ex)
+            {
+                //Logging the error message.
+                _logger.LogError(ex, "Error deleting all room amenities by room type ID");
+
+                //Returning the error message along with 500 HttpStatusCode.
+                return new APIResponse<RoomAmenityResponseDTO>(HttpStatusCode.InternalServerError, "Error deleting all room amenities by room type ID", ex.Message);
+            }
+        }
+
     }
 }
