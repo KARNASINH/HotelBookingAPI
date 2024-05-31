@@ -232,5 +232,41 @@ namespace HotelBookingAPI.Controllers
             }
         }
 
+
+
+
+
+
+        //This Endpoint is responsible for bulk updating the RoomAmenities.
+        [HttpPost("BulkUpdateRoomAmenities")]
+        public async Task<APIResponse<RoomAmenityResponseDTO>> BulkUpdateRoomAmenities([FromBody] RoomAmenitiesBulkInsertUpdateDTO input)
+        {
+            //Try block to bulk update the RoomAmenities.
+            try
+            {
+                //If the ModelState is not valid, then return the message Invalid Data in the Request Body along with 400 HttpStatusCode.
+                var response = await _roomAmenityRepository.BulkUpdateRoomAmenitiesAsync(input);
+
+                //If the response is successful, then return the response.
+                if (response.IsSuccess)
+                {
+                    //Returning the RoomAmenityResponseDTO along with 200 HttpStatusCode.
+                    return new APIResponse<RoomAmenityResponseDTO>(response, response.Message);
+                }
+
+                //If the response is not successful, then return the message along with 400 HttpStatusCode.
+                return new APIResponse<RoomAmenityResponseDTO>(HttpStatusCode.BadRequest, response.Message);
+            }
+            //Catch block to handle the exception.
+            catch (Exception ex)
+            {
+                //Logging the error message.
+                _logger.LogError(ex, "Error performing bulk update of room amenities");
+
+                //Returning the error message along with 500 HttpStatusCode.
+                return new APIResponse<RoomAmenityResponseDTO>(HttpStatusCode.InternalServerError, "Error performing bulk update of room amenities", ex.Message);
+            }
+        }
+
     }
 }
