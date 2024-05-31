@@ -259,10 +259,62 @@ namespace HotelBookingAPI.Repository
             };
         }
 
-
-
-
         
+
+
+
+
+
+
+
+        //This method is used to bulk update RoomAmenities in the database.
+        public async Task<RoomAmenityResponseDTO> BulkUpdateRoomAmenitiesAsync(RoomAmenitiesBulkInsertUpdateDTO input)
+        {
+            //Creating a connection object using the CreateConnection method from the SqlConnectionFactory class.
+            using var connection = _connectionFactory.CreateConnection();
+
+            //Creating a command object to execute the stored procedure spBulkUpdateRoomAmenities.
+            using var command = new SqlCommand("spBulkUpdateRoomAmenities", connection)
+            {
+                //Setting the command type to stored procedure.
+                CommandType = CommandType.StoredProcedure
+            };
+
+            //Adding the RoomTypeID as parameters to the command object.
+            command.Parameters.AddWithValue("@RoomTypeID", input.RoomTypeID);
+
+            //Adding the AmenityIDs as a table-valued parameter to the command object.
+            command.Parameters.Add(CreateAmenityIDTableParameter(input.AmenityIDs));
+
+            //Adding the output parameters to the command object.
+            var statusParam = new SqlParameter("@Status", SqlDbType.Bit) { Direction = ParameterDirection.Output };
+            var messageParam = new SqlParameter("@Message", SqlDbType.NVarChar, 255) { Direction = ParameterDirection.Output };
+
+            //Adding the output parameters to the command object.
+            command.Parameters.Add(statusParam);
+            command.Parameters.Add(messageParam);
+
+            //Opening the connection.
+            await connection.OpenAsync();
+
+            //Executing the command.
+            await command.ExecuteNonQueryAsync();
+
+            //Returning the response from the database.
+            return new RoomAmenityResponseDTO
+            {
+                //Setting up the properties of the response object.
+                IsSuccess = (bool)statusParam.Value,
+                Message = (string)messageParam.Value
+            };
+        }
+
+
+
+
+
+
+
         //This is a Helper method to create a SQL parameter for table-valued parameters
         private SqlParameter CreateAmenityIDTableParameter(IEnumerable<int> amenityIds)
         {
