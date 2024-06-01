@@ -39,15 +39,22 @@ namespace HotelBookingAPI.CustomValidator
             var maxPrice = maxPriceProperty.GetValue(validationContext.ObjectInstance, null) as decimal?;
 
             //Checks if the minimum and maximum price values are null
+            //If the values are null, then also return a ValidationResult with a success message, b'cos the main purpose of this validation is to check if the maximum price is greater than the minimum price
+            //To check if the values are null, we should use the "Required" attribute on the MinPrice and MaxPrice properties
             if (!minPrice.HasValue || !maxPrice.HasValue)
             {
                 //Return a ValidationResult with a success message
-                return ValidationResult.Success; // Consider how to handle nulls, potentially invalid state
+                return ValidationResult.Success;
             }
+
+            //Check if the maximum price is less than the minimum price
             if (minPrice.Value > maxPrice.Value)
             {
+                //Return a new ValidationResult with the error message
                 return new ValidationResult(ErrorMessage);
             }
+
+            //If the maximum price is greater than the minimum price, return a ValidationResult with a success message
             return ValidationResult.Success;
         }
     }
