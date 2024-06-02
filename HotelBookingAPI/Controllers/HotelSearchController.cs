@@ -129,5 +129,51 @@ namespace HotelBookingAPI.Controllers
             }
         }
 
+
+
+
+
+
+        //This endpoint is used to search the Hotels based on the RoomType Name.
+        [HttpGet("RoomType")]
+        public async Task<APIResponse<List<RoomSearchDTO>>> SearchByRoomType(string roomTypeName)
+        {
+            //Trying to execute the code inside the try block.
+            try
+            {
+                //Check if the RoomTypeName is empty or not.
+                if (string.IsNullOrEmpty(roomTypeName))
+                {
+                    //Log the error message.
+                    _logger.LogInformation("RoomType Name is Empty.");
+
+                    //Return the response with 400 Bad Request and the error message.
+                    return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.BadRequest, "RoomType Name is Empty.");
+                }
+
+                //Call the SearchByRoomTypeAsync method to get the rooms based on the RoomType Name.
+                var rooms = await _hotelSearchRepository.SearchByRoomTypeAsync(roomTypeName);
+
+                //Check if the rooms are available or not.
+                if (rooms != null && rooms.Count > 0)
+                {
+                    //Returning the response with the rooms data and 200 status code.
+                    return new APIResponse<List<RoomSearchDTO>>(rooms, "Got the rooms for the given RoomType name.");
+                }
+
+                //Returning the response with the 404 status code if no rooms are available.
+                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.BadRequest, "No Rooms found for the given RoomType name.");
+            }
+            //Catch the exception if any error occurs during the execution of the try block.
+            catch (Exception ex)
+            {
+                //Log the error message.
+                _logger.LogError(ex, "Failed to get rooms by RoomType name.");
+
+                //Return Http 500 Internal Server Error if any error occurs during the execution of the try block.
+                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.InternalServerError, "An error occurred while fetching rooms by RoomType.", ex.Message);
+            }
+        }
+
     }
 }
