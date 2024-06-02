@@ -77,8 +77,55 @@ namespace HotelBookingAPI.Controllers
                 //Log the error message.
                 _logger.LogError(ex, "Failed to get the rooms for the given dates.");
 
-                // Return Http 500 Internal Server Error if any error occurs during the execution of the Action Method.
+                // Return Http 500 Internal Server Error if any error occurs during the execution of the try block.
                 return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.InternalServerError, "Failed to get rooms for the given dates.", ex.Message);
+            }
+        }
+
+
+
+
+
+
+
+
+        //This endpoint is used to search the Hotels based on the Price Range that is MinPrice and MaxPrice.
+        [HttpGet("PriceRange")]
+        public async Task<APIResponse<List<RoomSearchDTO>>> SearchByPriceRange([FromQuery] PriceRangeHotelSearchRequestDTO request)
+        {
+            //Trying to execute the code.
+            try
+            {
+                //Check if the Model is valid or not.
+                if (!ModelState.IsValid)
+                {
+                    //Log the error message.
+                    _logger.LogInformation("Invalid Price Range in the Request Body.");
+
+                    //Return the response with the error message.
+                    return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.BadRequest, "Invalid Data in the Request Body.");
+                }
+
+                //Call the SearchByPriceRangeAsync method to get the rooms based on the Price Range.
+                var rooms = await _hotelSearchRepository.SearchByPriceRangeAsync(request.MinPrice, request.MaxPrice);
+
+                //Check if the rooms are available or not.
+                if (rooms != null && rooms.Count > 0)
+                {
+                    //Returning the response with the rooms data and 200 status code.
+                    return new APIResponse<List<RoomSearchDTO>>(rooms, "Got rooms for the given price range.");
+                }
+
+                //Returning the response with the 404 status code if no rooms are available.
+                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.BadRequest, "No Rooms Found for the given price range.");
+            }
+            catch (Exception ex)
+            {
+                //Log the error message.
+                _logger.LogError(ex, "Failed to get rooms for the given price range.");
+
+                //Return Http 500 Internal Server Error if any error occurs during the execution of the try block.
+                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.InternalServerError, "An error occurred while fetching rooms by price range.", ex.Message);
             }
         }
 
