@@ -187,6 +187,7 @@ namespace HotelBookingAPI.Repository
 
 
 
+
         //This method is used to fetch the Room details from the database based on the ViewType provided by the user.
         public async Task<List<RoomSearchDTO>> SearchByViewTypeAsync(string viewType)
         {
@@ -225,5 +226,47 @@ namespace HotelBookingAPI.Repository
             return rooms;
         }
 
+
+
+
+
+
+        //This method is used to fetch the Room details from the database based on the Amenity Name provided by the user.
+        public async Task<List<RoomSearchDTO>> SearchByAmenitiesAsync(string amenityName)
+        {
+            //List to store the Room fetched from the database.
+            var rooms = new List<RoomSearchDTO>();
+
+            //Creating a connection object using the SqlConnectionFactory object.
+            using (var connection = _connectionFactory.CreateConnection())
+            {
+                //Creating a SqlCommand object to execute the stored procedure spSearchByAmenities.
+                using (var command = new SqlCommand("spSearchByAmenities", connection))
+                {
+                    //Setting the command type to stored procedure.
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    //Adding the parameters to the stored procedure.
+                    command.Parameters.Add(new SqlParameter("@AmenityName", amenityName));
+
+                    //Opening the connection.
+                    connection.Open();
+
+                    //Executing the command and fetching the data using ExecuteReaderAsync method.
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        //Reading the data from the reader object.
+                        while (await reader.ReadAsync())
+                        {
+                            //Calling helper method to get the RoomSearchDTO object and adding it to the list.
+                            rooms.Add(CreateRoomSearchDTO(reader));
+                        }
+                    }
+                }
+            }
+
+            //Returning the list of RoomSearchDTO objects.
+            return rooms;
+        }
     }
 }
