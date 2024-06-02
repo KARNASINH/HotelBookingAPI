@@ -1,5 +1,8 @@
-﻿using HotelBookingAPI.Repository;
+﻿using HotelBookingAPI.DTOs.HotelSearchDTOs;
+using HotelBookingAPI.Models;
+using HotelBookingAPI.Repository;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace HotelBookingAPI.Controllers
 {
@@ -15,6 +18,10 @@ namespace HotelBookingAPI.Controllers
         //Logger object to log the information or errors.
         private readonly ILogger<HotelSearchController> _logger;
 
+
+
+
+
         //Constructor to initialize the Repository and Logger objects.
         public HotelSearchController(HotelSearchRepository hotelSearchRepository, ILogger<HotelSearchController> logger)
         {
@@ -22,6 +29,57 @@ namespace HotelBookingAPI.Controllers
             _hotelSearchRepository = hotelSearchRepository;
             //Initialize the Logger object.
             _logger = logger;
+        }
+
+
+
+
+
+
+
+
+        //This endpoint is used to search the Hotels based on the CheckIn and CheckOut dates.
+        //checkInDate=2024-06-18
+        //checkOutDate=2024-06-20
+        [HttpGet("Availability")]        
+        public async Task<APIResponse<List<RoomSearchDTO>>> SearchByAvailability([FromQuery] AvailabilityHotelSearchRequestDTO request)
+        {
+            //Trying to execute the code.
+            try
+            {
+                //Check if the Model is valid or not.
+                if (!ModelState.IsValid)
+                {
+                    //Log the error message.
+                    _logger.LogInformation("Invalid Data in the Request Body");
+
+                    //Return the response with the error message.
+                    return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.BadRequest, "Invalid Data in the Request Body");
+                }
+
+                //Call the SearchByAvailabilityAsync method to get the rooms based on the CheckIn and CheckOut dates.
+                var rooms = await _hotelSearchRepository.SearchByAvailabilityAsync(request.CheckInDate, request.CheckOutDate);
+
+                //Check if the rooms are available or not.
+                if (rooms != null && rooms.Count > 0)
+                {
+                    //Returning the response with the rooms data and 200 status code.
+                    return new APIResponse<List<RoomSearchDTO>>(rooms, "Rooms are Available for the given dates.");
+                }
+
+                //Returning the response with the 404 status code if no rooms are available.
+                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.NotFound, "No Roomd Found for the given dates.");
+            }
+
+            //Catch the exception if any error occurs.
+            catch (Exception ex)
+            {
+                //Log the error message.
+                _logger.LogError(ex, "Failed to get the rooms for the given dates.");
+
+                // Return Http 500 Internal Server Error if any error occurs during the execution of the Action Method.
+                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.InternalServerError, "Failed to get rooms for the given dates.", ex.Message);
+            }
         }
 
     }
