@@ -28,6 +28,7 @@ namespace HotelBookingAPI.Repository
 
 
 
+
         //This method is used to fetch the Room details from the database based on the CheckIn and CheckOut dates.
         public async Task<List<RoomSearchDTO>> SearchByAvailabilityAsync(DateTime checkInDate, DateTime checkOutDate)
         {
@@ -72,6 +73,7 @@ namespace HotelBookingAPI.Repository
 
 
 
+
         //This would be a Helper method which takes SqlDataReader object as input and returns the RoomSearchDTO object.
         //In all the methods in the Repository class, we would be using this method to create and to return the RoomSearchDTO object.
         private RoomSearchDTO CreateRoomSearchDTO(SqlDataReader reader)
@@ -92,6 +94,50 @@ namespace HotelBookingAPI.Repository
                     Description = reader.GetString(reader.GetOrdinal("Description"))
                 }
             };
+        }
+
+
+
+
+
+
+        //This method is used to fetch the Room details from the database based on the Minumum and Maximum Price range provided by the user.
+        public async Task<List<RoomSearchDTO>> SearchByPriceRangeAsync(decimal minPrice, decimal maxPrice)
+        {
+            //List to store the Room fetched from the database.
+            var rooms = new List<RoomSearchDTO>();
+
+            //Creating a connection object using the SqlConnectionFactory object.
+            using (var connection = _connectionFactory.CreateConnection())
+            {
+                //Creating a SqlCommand object to execute the stored procedure spSearchByPriceRange.
+                using (var command = new SqlCommand("spSearchByPriceRange", connection))
+                {
+                    //Setting the command type to stored procedure.
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    //Adding the parameters to the stored procedure.
+                    command.Parameters.Add(new SqlParameter("@MinPrice", minPrice));
+                    command.Parameters.Add(new SqlParameter("@MaxPrice", maxPrice));
+
+                    //Opening the connection.
+                    connection.Open();
+
+                    //Executing the command and fetching the data using ExecuteReaderAsync method.
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        //Reading the data from the reader object.
+                        while (await reader.ReadAsync())
+                        {
+                            //Calling helper method to get the RoomSearchDTO object and adding it to the list.
+                            rooms.Add(CreateRoomSearchDTO(reader));
+                        }
+                    }
+                }
+            }
+
+            //Returning the list of RoomSearchDTO objects.
+            return rooms;
         }
 
     }
