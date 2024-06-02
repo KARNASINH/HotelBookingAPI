@@ -459,6 +459,56 @@ namespace HotelBookingAPI.Repository
 
 
 
+        //This method is used to fetch the Room details from the database based on different combinations of the search criteria provided by the user.
+        //User can none, any or all of the search criteria to get the Room details.
+        //These are the search criteria: MinPrice, MaxPrice, RoomTypeName, AmenityName, ViewType.
+        public async Task<List<RoomSearchDTO>> SearchCustomCombinationAsync(CustomHotelSearchCriteriaDTO criteria)
+        {
+            //List to store the Room fetched from the database.
+            var rooms = new List<RoomSearchDTO>();
+
+            //Creating a connection object using the SqlConnectionFactory object.
+            using (var connection = _connectionFactory.CreateConnection())
+            {
+                //Creating a SqlCommand object to execute the stored procedure spSearchCustomCombination.
+                var command = new SqlCommand("spSearchCustomCombination", connection)
+                {
+                    //Setting the command type to stored procedure.
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                //Adding the parameters to the stored procedure.
+                command.Parameters.AddWithValue("@MinPrice", (object)criteria.MinPrice ?? DBNull.Value);
+                command.Parameters.AddWithValue("@MaxPrice", (object)criteria.MaxPrice ?? DBNull.Value);
+                command.Parameters.AddWithValue("@RoomTypeName", string.IsNullOrEmpty(criteria.RoomTypeName) ? DBNull.Value : criteria.RoomTypeName);
+                command.Parameters.AddWithValue("@AmenityName", string.IsNullOrEmpty(criteria.AmenityName) ? DBNull.Value : criteria.AmenityName);
+                command.Parameters.AddWithValue("@ViewType", string.IsNullOrEmpty(criteria.ViewType) ? DBNull.Value : criteria.ViewType);
+
+                //Opening the connection.
+                connection.Open();
+
+                //Executing the command and fetching the data using ExecuteReaderAsync method.
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    //Looping through Reader object to get the data row by row.
+                    while (await reader.ReadAsync())
+                    {
+                        //Calling helper method to get the RoomSearchDTO object and adding it to the list.
+                        rooms.Add(CreateRoomSearchDTO(reader));
+                    }
+                }
+            }
+
+            //Returning the list of RoomSearchDTO objects.
+            return rooms;
+        }
+
+
+
+
+
+
+
 
         //This would be a Helper method which takes SqlDataReader object as input and returns the RoomSearchDTO object.
         //In all the methods in the Repository class, we would be using this method to create and to return the RoomSearchDTO object.
