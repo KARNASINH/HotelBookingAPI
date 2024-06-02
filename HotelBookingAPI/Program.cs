@@ -26,6 +26,7 @@ builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<RoomRepository>();
 builder.Services.AddScoped<AmenityRepository>();
 builder.Services.AddScoped<RoomAmenityRepository>();
+builder.Services.AddScoped<HotelSearchRepository>();
 
 var app = builder.Build();
 
