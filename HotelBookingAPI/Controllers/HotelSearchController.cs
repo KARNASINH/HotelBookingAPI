@@ -134,6 +134,7 @@ namespace HotelBookingAPI.Controllers
 
 
 
+        
         //This endpoint is used to search the Hotels based on the RoomType Name.
         [HttpGet("RoomType")]
         public async Task<APIResponse<List<RoomSearchDTO>>> SearchByRoomType(string roomTypeName)
@@ -162,7 +163,7 @@ namespace HotelBookingAPI.Controllers
                 }
 
                 //Returning the response with the 404 status code if no rooms are available.
-                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.BadRequest, "No Rooms found for the given RoomType name.");
+                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.NotFound, "No Rooms found for the given RoomType name.");
             }
             //Catch the exception if any error occurs during the execution of the try block.
             catch (Exception ex)
@@ -174,6 +175,14 @@ namespace HotelBookingAPI.Controllers
                 return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.InternalServerError, "An error occurred while fetching rooms by RoomType.", ex.Message);
             }
         }
+
+
+
+
+
+
+
+
 
     }
 }
