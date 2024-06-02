@@ -74,33 +74,6 @@ namespace HotelBookingAPI.Repository
 
 
 
-        //This would be a Helper method which takes SqlDataReader object as input and returns the RoomSearchDTO object.
-        //In all the methods in the Repository class, we would be using this method to create and to return the RoomSearchDTO object.
-        private RoomSearchDTO CreateRoomSearchDTO(SqlDataReader reader)
-        {
-            return new RoomSearchDTO
-            {
-                RoomID = reader.GetInt32(reader.GetOrdinal("RoomID")),
-                RoomNumber = reader.GetString(reader.GetOrdinal("RoomNumber")),
-                Price = reader.GetDecimal(reader.GetOrdinal("Price")),
-                BedType = reader.GetString(reader.GetOrdinal("BedType")),
-                ViewType = reader.GetString(reader.GetOrdinal("ViewType")),
-                Status = reader.GetString(reader.GetOrdinal("Status")),
-                RoomType = new RoomTypeSearchDTO
-                {
-                    RoomTypeID = reader.GetInt32(reader.GetOrdinal("RoomTypeID")),
-                    TypeName = reader.GetString(reader.GetOrdinal("TypeName")),
-                    AccessibilityFeatures = reader.GetString(reader.GetOrdinal("AccessibilityFeatures")),
-                    Description = reader.GetString(reader.GetOrdinal("Description"))
-                }
-            };
-        }
-
-
-
-
-
-
         //This method is used to fetch the Room details from the database based on the Minumum and Maximum Price range provided by the user.
         public async Task<List<RoomSearchDTO>> SearchByPriceRangeAsync(decimal minPrice, decimal maxPrice)
         {
@@ -274,6 +247,7 @@ namespace HotelBookingAPI.Repository
 
 
 
+
         //This method is used to fetch the Room details from the database based on the RoomTypeID provided by the user.
         public async Task<List<RoomSearchDTO>> SearchRoomsByRoomTypeIDAsync(int roomTypeID)
         {
@@ -310,6 +284,103 @@ namespace HotelBookingAPI.Repository
 
             //Returning the list of RoomSearchDTO objects.
             return rooms;
+        }
+
+
+
+
+
+
+
+        //This method is used to fetch the Room details from the database based on the RoomID provided by the user.
+        //This method fetches the two result sets from the database, one for Room details and another for Amenities details.
+        //1st result set will have only one record and taht is why we are directly casting to RoomSearchDTO object using CreateRoomSearchDTO Helper method.
+        //2nd result set will have multiple records and we are iterating through the records and creating the AmenitySearchDTO objects and adding them to the list.
+        public async Task<RoomDetailsWithAmenitiesSearchDTO> GetRoomDetailsWithAmenitiesByRoomIDAsync(int roomID)
+        {
+            //Creating a RoomDetailsWithAmenitiesSearchDTO object to store the Room and Amenities details.
+            //This object has two complex object, RoomDetails and Amenities list.
+            RoomDetailsWithAmenitiesSearchDTO roomDetails = new RoomDetailsWithAmenitiesSearchDTO();
+            
+            //Creating a connection object using the SqlConnectionFactory object.
+            using (var connection = _connectionFactory.CreateConnection())
+            {
+                //Creating a SqlCommand object to execute the stored procedure spGetRoomDetailsWithAmenitiesByRoomID.
+                using (var command = new SqlCommand("spGetRoomDetailsWithAmenitiesByRoomID", connection))
+                {
+                    //Setting the command type to stored procedure.
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    //Adding the parameters to the stored procedure.
+                    command.Parameters.Add(new SqlParameter("@RoomID", roomID));
+
+                    //Opening the connection.
+                    connection.Open();
+
+                    //Executing the command and fetching the data using ExecuteReaderAsync method.
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        //Checking if the reader has any data.
+                        if (await reader.ReadAsync())
+                        {
+                            //Calling helper method to get the RoomSearchDTO object and assigning it to the Room property of RoomDetails object.
+                            roomDetails.Room = CreateRoomSearchDTO(reader);
+
+                            //Checking if the reader has more result sets.
+                            roomDetails.Amenities = new List<AmenitySearchDTO>();
+
+                            //Checking if the reader has more result sets.
+                            if (await reader.NextResultAsync())
+                            {
+                                //Iterating through the records and creating the AmenitySearchDTO objects and adding them to the list.
+                                while (await reader.ReadAsync())
+                                {
+                                    //Creating the AmenitySearchDTO object and adding it to the list.
+                                    roomDetails.Amenities.Add(new AmenitySearchDTO
+                                    {
+                                        //Reading the data from the reader object.
+                                        AmenityID = reader.GetInt32(reader.GetOrdinal("AmenityID")),
+                                        Name = reader.GetString(reader.GetOrdinal("Name")),
+                                        Description = reader.GetString(reader.GetOrdinal("Description"))
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            //Returning the RoomDetailsWithAmenitiesSearchDTO object.
+            return roomDetails;
+        }
+
+
+
+
+
+
+
+
+        //This would be a Helper method which takes SqlDataReader object as input and returns the RoomSearchDTO object.
+        //In all the methods in the Repository class, we would be using this method to create and to return the RoomSearchDTO object.
+        private RoomSearchDTO CreateRoomSearchDTO(SqlDataReader reader)
+        {
+            return new RoomSearchDTO
+            {
+                RoomID = reader.GetInt32(reader.GetOrdinal("RoomID")),
+                RoomNumber = reader.GetString(reader.GetOrdinal("RoomNumber")),
+                Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                BedType = reader.GetString(reader.GetOrdinal("BedType")),
+                ViewType = reader.GetString(reader.GetOrdinal("ViewType")),
+                Status = reader.GetString(reader.GetOrdinal("Status")),
+                RoomType = new RoomTypeSearchDTO
+                {
+                    RoomTypeID = reader.GetInt32(reader.GetOrdinal("RoomTypeID")),
+                    TypeName = reader.GetString(reader.GetOrdinal("TypeName")),
+                    AccessibilityFeatures = reader.GetString(reader.GetOrdinal("AccessibilityFeatures")),
+                    Description = reader.GetString(reader.GetOrdinal("Description"))
+                }
+            };
         }
     }
 }
