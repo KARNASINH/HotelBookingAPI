@@ -361,6 +361,56 @@ namespace HotelBookingAPI.Repository
 
 
 
+        
+        //This method is used to fetch the Amenities details from the database based on the RoomID provided by the user.
+        public async Task<List<AmenitySearchDTO>> GetRoomAmenitiesByRoomIDAsync(int roomID)
+        {
+            //List to store the Amenities fetched from the database.
+            var amenities = new List<AmenitySearchDTO>();
+
+            //Creating a connection object using the SqlConnectionFactory object.
+            using (var connection = _connectionFactory.CreateConnection())
+            {
+                //Creating a SqlCommand object to execute the stored procedure spGetRoomAmenitiesByRoomID.
+                using (var command = new SqlCommand("spGetRoomAmenitiesByRoomID", connection))
+                {
+                    //Setting the command type to stored procedure.
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    //Adding the parameters to the stored procedure.
+                    command.Parameters.Add(new SqlParameter("@RoomID", roomID));
+
+                    //Opening the connection.
+                    connection.Open();
+
+                    //Executing the command and fetching the data using ExecuteReaderAsync method.
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        //Reading the data from the reader object.
+                        while (await reader.ReadAsync())
+                        {
+                            //Creating the AmenitySearchDTO object and adding it to the list.
+                            amenities.Add(new AmenitySearchDTO
+                            {
+                                //Reading the data from the reader object and setting the values to the properties of AmenitySearchDTO object.
+                                AmenityID = reader.GetInt32(reader.GetOrdinal("AmenityID")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                Description = reader.GetString("Description")
+                            });
+                        }
+                    }
+                }
+            }
+
+            //Returning the list of AmenitySearchDTO objects.
+            return amenities;
+        }
+
+
+
+
+
+
         //This would be a Helper method which takes SqlDataReader object as input and returns the RoomSearchDTO object.
         //In all the methods in the Repository class, we would be using this method to create and to return the RoomSearchDTO object.
         private RoomSearchDTO CreateRoomSearchDTO(SqlDataReader reader)
