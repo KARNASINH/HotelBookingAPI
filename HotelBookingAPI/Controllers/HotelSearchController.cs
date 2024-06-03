@@ -183,6 +183,28 @@ namespace HotelBookingAPI.Controllers
 
 
 
-
+        [HttpGet("ViewType")]
+        public async Task<APIResponse<List<RoomSearchDTO>>> SearchByViewType(string viewType)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(viewType))
+                {
+                    _logger.LogInformation("View Type is Empty");
+                    return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.BadRequest, "View Type is Empty");
+                }
+                var rooms = await _hotelSearchRepository.SearchByViewTypeAsync(viewType);
+                if (rooms != null && rooms.Count > 0)
+                {
+                    return new APIResponse<List<RoomSearchDTO>>(rooms, "Fetch rooms by view type Successful");
+                }
+                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.BadRequest, "No Record Found");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to get rooms by view type");
+                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.InternalServerError, "An error occurred while fetching rooms by view type.", ex.Message);
+            }
+        }
     }
 }
