@@ -182,29 +182,52 @@ namespace HotelBookingAPI.Controllers
 
 
 
-
+        //This endpoint is used to search the Hotels based on the ViewType.
         [HttpGet("ViewType")]
         public async Task<APIResponse<List<RoomSearchDTO>>> SearchByViewType(string viewType)
         {
+            //Trying to execute the code inside the try block.
             try
             {
+                //Check if the ViewType is empty or not.
                 if (string.IsNullOrEmpty(viewType))
                 {
-                    _logger.LogInformation("View Type is Empty");
-                    return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.BadRequest, "View Type is Empty");
+                    //Log the error message.
+                    _logger.LogInformation("ViewType is Empty.");
+
+                    //Return the response with 400 Bad Request and the error message.
+                    return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.BadRequest, "ViewType is Empty.");
                 }
+
+                //Call the SearchByViewTypeAsync method to get the rooms based on the ViewType.
                 var rooms = await _hotelSearchRepository.SearchByViewTypeAsync(viewType);
+
+                //Check if the rooms are available or not.
                 if (rooms != null && rooms.Count > 0)
                 {
-                    return new APIResponse<List<RoomSearchDTO>>(rooms, "Fetch rooms by view type Successful");
+                    //Returning the response with the rooms data and 200 status code.
+                    return new APIResponse<List<RoomSearchDTO>>(rooms, "Fetch rooms by ViewType Successful.");
                 }
-                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.BadRequest, "No Record Found");
+
+                //Returning the response with the 404 status code if no rooms are available.
+                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.NotFound, "No Rooms found for the given ViewType name.");
             }
+            //Catch the exception if any error occurs during the execution of the try block.
             catch (Exception ex)
             {
+                //Log the error message.
                 _logger.LogError(ex, "Failed to get rooms by view type");
-                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.InternalServerError, "An error occurred while fetching rooms by view type.", ex.Message);
+
+                //Return Http 500 Internal Server Error if any error occurs during the execution of the try block.
+                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.InternalServerError, "An error occurred while fetching rooms by ViewType.", ex.Message);
             }
         }
+
+
+
+
+
+
+
     }
 }
