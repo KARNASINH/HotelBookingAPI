@@ -451,5 +451,53 @@ namespace HotelBookingAPI.Controllers
                 return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.InternalServerError, "An error occurred while fetching rooms by minimum rating.", ex.Message);
             }
         }
+
+
+
+
+
+
+        //This endpoint is used to get the Rooms based on the different combinations of the Search Criteria.
+        //User can none, any or all of the search criteria to get the Room details.
+        //These are the search criteria: MinPrice, MaxPrice, RoomTypeName, AmenityName, ViewType.
+        [HttpGet("CustomSearch")]
+        public async Task<APIResponse<List<RoomSearchDTO>>> SearchCustomCombination([FromQuery] CustomHotelSearchCriteriaDTO criteria)
+        {
+            //Trying to execute the code inside the try block.
+            try
+            {
+                //Check if the Model is valid or not.
+                if (!ModelState.IsValid)
+                {
+                    //Log the error message.
+                    _logger.LogInformation("Invalid Data in the Request Body");
+
+                    //Return the response with 400 Bad Request and the error message.
+                    return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.BadRequest, "Invalid Data in the Request Body.");
+                }
+
+                //Call the SearchCustomCombinationAsync method to get the rooms based on the Custom Search Criteria.
+                var rooms = await _hotelSearchRepository.SearchCustomCombinationAsync(criteria);
+
+                //Check if the rooms are available or not.
+                if (rooms != null && rooms.Count > 0)
+                {
+                    //Returning the response with the rooms data and 200 status code.
+                    return new APIResponse<List<RoomSearchDTO>>(rooms, "Fetch Room By Custom Search Successful.");
+                }
+
+                //Returning the response with the 404 status code if no rooms are available.
+                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.NotFound, "No Record Found");
+            }
+            //Catch the exception if any error occurs during the execution of the try block.
+            catch (Exception ex)
+            {
+                //Log the error message.
+                _logger.LogError(ex, "Failed to perform custom search");
+
+                //Return Http 500 Internal Server Error if any error occurs during the execution of the try block.
+                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.InternalServerError, "An error occurred during the custom search.", ex.Message);
+            }
+        }
     }
 }
