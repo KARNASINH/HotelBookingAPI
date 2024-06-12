@@ -405,5 +405,51 @@ namespace HotelBookingAPI.Controllers
                 return new APIResponse<List<AmenitySearchDTO>>(HttpStatusCode.InternalServerError, "An error occurred while fetching room amenities.", ex.Message);
             }
         }
+
+
+
+
+
+
+        //This endpoint is used to get the Rooms based on the Minimum Rating.
+        [HttpGet("ByRating")]
+        public async Task<APIResponse<List<RoomSearchDTO>>> SearchByMinRating(float minRating)
+        {
+            //Trying to execute the code inside the try block.
+            try
+            {
+                //Check if the MinRating is less than or equal to 0 and greater than 5.
+                if (minRating <= 0 && minRating > 5)
+                {
+                    //Log the error message.
+                    _logger.LogInformation($"Invalid Rating: {minRating}");
+
+                    //Return the response with 400 Bad Request and the error message.
+                    return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.BadRequest, $"Invalid Rating: {minRating}");
+                }
+
+                //Call the SearchByMinRatingAsync method to get the rooms based on the Minimum Rating.
+                var rooms = await _hotelSearchRepository.SearchByMinRatingAsync(minRating);
+
+                //Check if the rooms are available or not.
+                if (rooms != null && rooms.Count > 0)
+                {
+                    //Returning the response with the rooms data and 200 status code.
+                    return new APIResponse<List<RoomSearchDTO>>(rooms, "Successfully fetched rooms by minimum rating.");
+                }
+
+                //Returning the response with the 404 status code if no rooms are available.
+                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.NotFound, "No Record Found");
+            }
+            //Catch the exception if any error occurs during the execution of the try block.
+            catch (Exception ex)
+            {
+                //Log the error message.
+                _logger.LogError(ex, "Failed to get rooms by minimum rating");
+
+                //Return Http 500 Internal Server Error if any error occurs during the execution of the try block.
+                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.InternalServerError, "An error occurred while fetching rooms by minimum rating.", ex.Message);
+            }
+        }
     }
 }
