@@ -109,5 +109,69 @@ namespace HotelBookingAPI.Repository
             //Returning the RoomCostsResponseDTO object.
             return roomCostsResponseDTO;
         }
+
+
+
+
+
+
+        //This method is used to create a reservation.
+        public async Task<CreateReservationResponseDTO> CreateReservationAsync(CreateReservationDTO reservation)
+        {
+            //Creating an object of CreateReservationResponseDTO class to hold the
+            CreateReservationResponseDTO createReservationResponseDTO = new CreateReservationResponseDTO();
+            try
+            {
+                //Creating a connection object using the CreateConnection method of SqlConnectionFactory class.
+                using var connection = _connectionFactory.CreateConnection();
+
+                //Creating a command object to execute the stored procedure.
+                using var command = new SqlCommand("spCreateReservation", connection);
+
+                //Setting the command type to stored procedure.
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@UserID", reservation.UserID);
+                command.Parameters.AddWithValue("@CheckInDate", reservation.CheckInDate);
+                command.Parameters.AddWithValue("@CheckOutDate", reservation.CheckOutDate);
+                command.Parameters.AddWithValue("@CreatedBy", reservation.UserID);
+
+                //Creating a DataTable object to hold the RoomIDs.
+                var table = new DataTable();
+
+                //Adding the column to the DataTable.
+                table.Columns.Add("RoomID", typeof(int));
+
+                //Adding the RoomIDs to the DataTable.
+                reservation.RoomIDs.ForEach(id => table.Rows.Add(id));
+
+                //Adding the DataTable as a parameter to the stored procedure.
+                command.Parameters.AddWithValue("@RoomIDs", table).SqlDbType = SqlDbType.Structured;
+
+                //Adding the output parameters to the stored procedure.
+                command.Parameters.Add("@Message", SqlDbType.NVarChar, 255).Direction = ParameterDirection.Output;
+                command.Parameters.Add("@Status", SqlDbType.Bit).Direction = ParameterDirection.Output;
+                command.Parameters.Add("@ReservationID", SqlDbType.Int).Direction = ParameterDirection.Output;
+
+                //Opening the connection.
+                await connection.OpenAsync();
+
+                //Executing the command and storing the result in a reader object.
+                await command.ExecuteNonQueryAsync();
+
+                //Setting the output parameters to the CreateReservationResponseDTO object.
+                createReservationResponseDTO.Message = command.Parameters["@Message"].Value.ToString();
+                createReservationResponseDTO.Status = (bool)command.Parameters["@Status"].Value;
+                createReservationResponseDTO.ReservationID = (int)command.Parameters["@ReservationID"].Value;
+            }
+            //Catch block to catch the exceptions if any.
+            catch (Exception ex)
+            {
+                //Setting the status to false and the message to the exception message.
+                createReservationResponseDTO.Message = ex.Message;
+                createReservationResponseDTO.Status = false;
+            }
+            //Returning the CreateReservationResponseDTO object.
+            return createReservationResponseDTO;
+        }
     }
 }
