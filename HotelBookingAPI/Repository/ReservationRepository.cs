@@ -1,5 +1,6 @@
 ﻿using HotelBookingAPI.Connection;
 using HotelBookingAPI.DTOs.BookingDTOs;
+using HotelBookingAPI.DTOs.PaymentDTOs;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
@@ -178,6 +179,7 @@ namespace HotelBookingAPI.Repository
 
 
 
+
         //This method is used to add guests to a reservation.
         public async Task<AddGuestsToReservationResponseDTO> AddGuestsToReservationAsync(AddGuestsToReservationDTO details)
         {
@@ -241,6 +243,61 @@ namespace HotelBookingAPI.Repository
             }
             //Returning the AddGuestsToReservationResponseDTO object.
             return addGuestsToReservationResponseDTO;
+        }
+
+
+
+
+
+
+        //This method is used to process the payment for a reservation.
+        public async Task<ProcessPaymentResponseDTO> ProcessPaymentAsync(ProcessPaymentDTO payment)
+        {
+            //Creating an object of ProcessPaymentResponseDTO class to hold the response.
+            ProcessPaymentResponseDTO processPaymentResponseDTO = new ProcessPaymentResponseDTO();
+
+            //Try block to execute the code and catch the exceptions if any.
+            try
+            {
+                //Creating a connection object using the CreateConnection method of SqlConnectionFactory class.
+                using var connection = _connectionFactory.CreateConnection();
+
+                //Creating a command object to execute the stored procedure.
+                using var command = new SqlCommand("spProcessPayment", connection);
+
+                //Setting the command type to stored procedure.
+                command.CommandType = CommandType.StoredProcedure;
+
+                //Setting up the parameters for the stored procedure.
+                command.Parameters.AddWithValue("@ReservationID", payment.ReservationID);
+                command.Parameters.AddWithValue("@TotalAmount", payment.TotalAmount);
+                command.Parameters.AddWithValue("@PaymentMethod", payment.PaymentMethod);
+
+                //Adding the output parameters to the stored procedure.
+                command.Parameters.Add("@PaymentID", SqlDbType.Int).Direction = ParameterDirection.Output;
+                command.Parameters.Add("@Status", SqlDbType.Bit).Direction = ParameterDirection.Output;
+                command.Parameters.Add("@Message", SqlDbType.NVarChar, 255).Direction = ParameterDirection.Output;
+
+                //Opening the connection.
+                await connection.OpenAsync();
+
+                //Executing the command and storing the result in a reader object.
+                await command.ExecuteNonQueryAsync();
+
+                //Setting the output parameters to the ProcessPaymentResponseDTO object.
+                processPaymentResponseDTO.PaymentID = (int)command.Parameters["@PaymentID"].Value;
+                processPaymentResponseDTO.Status = (bool)command.Parameters["@Status"].Value;
+                processPaymentResponseDTO.Message = command.Parameters["@Message"].Value.ToString();
+            }
+            //Catch block to catch the exceptions if any.
+            catch (Exception ex)
+            {
+                //Setting the status to false and the message to the exception message.
+                processPaymentResponseDTO.Message = ex.Message;
+                processPaymentResponseDTO.Status = false;
+            }
+            //Returning the ProcessPaymentResponseDTO object.
+            return processPaymentResponseDTO;
         }
     }
 }
