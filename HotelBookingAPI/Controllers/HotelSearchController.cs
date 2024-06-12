@@ -360,5 +360,50 @@ namespace HotelBookingAPI.Controllers
                 return new APIResponse<RoomDetailsWithAmenitiesSearchDTO>(HttpStatusCode.InternalServerError, "An error occurred while fetching room details with amenities.", ex.Message);
             }
         }
+
+
+
+
+
+        //This endpoint is used to get the Amenities for the given RoomID.
+        [HttpGet("RoomAmenities")]
+        public async Task<APIResponse<List<AmenitySearchDTO>>> GetRoomAmenitiesByRoomID(int roomID)
+        {
+            //Trying to execute the code inside the try block.
+            try
+            {
+                //Check if the RoomID is less than or equal to 0.
+                if (roomID <= 0)
+                {
+                    //Log the error message.
+                    _logger.LogInformation($"Invalid Room ID, {roomID}");
+
+                    //Return the response with 400 Bad Request and the error message.
+                    return new APIResponse<List<AmenitySearchDTO>>(HttpStatusCode.BadRequest, $"Invalid Room ID, {roomID}");
+                }
+
+                //Call the GetRoomAmenitiesByRoomIDAsync method to get the amenities based on the RoomID.
+                var amenities = await _hotelSearchRepository.GetRoomAmenitiesByRoomIDAsync(roomID);
+
+                //Check if the amenities are available or not.
+                if (amenities != null && amenities.Count > 0)
+                {
+                    //Returning the response with the amenities data and 200 status code.
+                    return new APIResponse<List<AmenitySearchDTO>>(amenities, "Fetch Amenities for the given RoomID.");
+                }
+
+                //Returning the response with the 404 status code if no amenities are available.
+                return new APIResponse<List<AmenitySearchDTO>>(HttpStatusCode.NotFound, "No Record Found");
+            }
+            //Catch the exception if any error occurs during the execution of the try block.
+            catch (Exception ex)
+            {
+                //Log the error message.
+                _logger.LogError(ex, $"Failed to get amenities for RoomID {roomID}");
+
+                //Return Http 500 Internal Server Error if any error occurs during the execution of the try block.
+                return new APIResponse<List<AmenitySearchDTO>>(HttpStatusCode.InternalServerError, "An error occurred while fetching room amenities.", ex.Message);
+            }
+        }
     }
 }
