@@ -255,7 +255,7 @@ namespace HotelBookingAPI.Controllers
                 }
 
                 //Returning the response with the 404 status code if no rooms are available.
-                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.BadRequest, "No Record Found.");
+                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.NotFound, "No Record Found.");
             }
             //Catch the exception if any error occurs during the execution of the try block.
             catch (Exception ex)
@@ -265,6 +265,52 @@ namespace HotelBookingAPI.Controllers
 
                 //Return Http 500 Internal Server Error if any error occurs during the execution of the try block.
                 return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.InternalServerError, "An error occurred while fetching rooms by amenity name.", ex.Message);
+            }
+        }
+
+
+
+
+
+        //This endpoint is used to search the Hotels based on the RoomType ID.
+        [HttpGet("RoomsByType")]
+        public async Task<APIResponse<List<RoomSearchDTO>>> SearchRoomsByRoomTypeID(int roomTypeID)
+        {
+            //Trying to execute the code inside the try block.
+            try
+            {
+                //Check if the RoomTypeID is less than or equal to 0.
+                if (roomTypeID <= 0)
+                {
+                    //Log the error message.
+                    _logger.LogInformation($"Invalid Room Type ID, {roomTypeID}");
+
+                    //Return the response with 400 Bad Request and the error message.
+                    return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.BadRequest, $"Invalid Room Type ID, {roomTypeID}");
+                }
+
+                //Call the SearchRoomsByRoomTypeIDAsync method to get the rooms based on the RoomType ID.
+                var rooms = await _hotelSearchRepository.SearchRoomsByRoomTypeIDAsync(roomTypeID);
+
+                //Check if the rooms are available or not.
+                if (rooms != null && rooms.Count > 0)
+                {
+                    //Returning the response with the rooms data and 200 status code.
+                    return new APIResponse<List<RoomSearchDTO>>(rooms, "Fetch rooms by room type ID Successful.");
+                }
+
+                //Returning the response with the 404 status code if no rooms are available.
+                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.NotFound, "No Record Found.");
+            }
+
+            //Catch the exception if any error occurs during the execution of the try block.
+            catch (Exception ex)
+            {
+                //Log the error message.
+                _logger.LogError(ex, "Failed to get rooms by Room Type ID.");
+
+                //Return Http 500 Internal Server Error if any error occurs during the execution of the try block.
+                return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.InternalServerError, "An error occurred while fetching rooms by room type ID.", ex.Message);
             }
         }
     }
