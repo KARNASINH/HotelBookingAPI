@@ -173,5 +173,74 @@ namespace HotelBookingAPI.Repository
             //Returning the CreateReservationResponseDTO object.
             return createReservationResponseDTO;
         }
+
+
+
+
+
+        //This method is used to add guests to a reservation.
+        public async Task<AddGuestsToReservationResponseDTO> AddGuestsToReservationAsync(AddGuestsToReservationDTO details)
+        {
+            //Creating an object of AddGuestsToReservationResponseDTO class to hold the response.
+            AddGuestsToReservationResponseDTO addGuestsToReservationResponseDTO = new AddGuestsToReservationResponseDTO();
+
+            //Try block to execute the code and catch the exceptions if any.
+            try
+            {
+                //Creating a connection object using the CreateConnection method of SqlConnectionFactory class.
+                using var connection = _connectionFactory.CreateConnection();
+
+                //Creating a command object to execute the stored procedure.
+                using var command = new SqlCommand("spAddGuestsToReservation", connection);
+
+                //Setting the command type to stored procedure.
+                command.CommandType = CommandType.StoredProcedure;
+
+                //Setting up the parameters for the stored procedure.
+                command.Parameters.AddWithValue("@UserID", details.UserID);
+                command.Parameters.AddWithValue("@ReservationID", details.ReservationID);
+
+                //Creating a DataTable object to hold the GuestDetails.
+                var table = new DataTable();
+                table.Columns.Add("FirstName", typeof(string));
+                table.Columns.Add("LastName", typeof(string));
+                table.Columns.Add("Email", typeof(string));
+                table.Columns.Add("Phone", typeof(string));
+                table.Columns.Add("AgeGroup ", typeof(string));
+                table.Columns.Add("Address", typeof(string));
+                table.Columns.Add("CountryId", typeof(int));
+                table.Columns.Add("StateId", typeof(int));
+                table.Columns.Add("RoomID", typeof(int));
+                
+                //Adding the GuestDetails to the DataTable.
+                details.GuestDetails.ForEach(guest =>
+                {
+                    table.Rows.Add(guest.FirstName, guest.LastName, guest.Email, guest.Phone,
+                    guest.AgeGroup, guest.Address, guest.CountryId, guest.StateId, guest.RoomID);
+                });
+
+                //Adding the DataTable as a parameter to the stored procedure.
+                command.Parameters.AddWithValue("@GuestDetails", table).SqlDbType = SqlDbType.Structured;
+                command.Parameters.Add("@Status", SqlDbType.Bit).Direction = ParameterDirection.Output;
+                command.Parameters.Add("@Message", SqlDbType.NVarChar, 255).Direction = ParameterDirection.Output;
+
+                //Opening the connection.
+                await connection.OpenAsync();
+                await command.ExecuteNonQueryAsync();
+
+                //Setting the output parameters to the AddGuestsToReservationResponseDTO object.
+                addGuestsToReservationResponseDTO.Status = (bool)command.Parameters["@Status"].Value;
+                addGuestsToReservationResponseDTO.Message = command.Parameters["@Message"].Value.ToString();
+            }
+            //Catch block to catch the exceptions if any.
+            catch (Exception ex)
+            {
+                //Setting the status to false and the message to the exception message.
+                addGuestsToReservationResponseDTO.Message = ex.Message;
+                addGuestsToReservationResponseDTO.Status = false;
+            }
+            //Returning the AddGuestsToReservationResponseDTO object.
+            return addGuestsToReservationResponseDTO;
+        }
     }
 }
