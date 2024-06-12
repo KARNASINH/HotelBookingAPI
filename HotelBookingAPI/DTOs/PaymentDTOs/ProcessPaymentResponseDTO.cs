@@ -1,4 +1,4 @@
-﻿namespace HotelBookingAPI.DTOs.BookingDTOs
+﻿namespace HotelBookingAPI.DTOs.PaymentDTOs
 {
     //THis class is used to hold the response wheather the payment is successful or not
     public class ProcessPaymentResponseDTO
