@@ -299,5 +299,60 @@ namespace HotelBookingAPI.Repository
             //Returning the ProcessPaymentResponseDTO object.
             return processPaymentResponseDTO;
         }
+
+
+
+
+
+        //This method is used to update the payment status.
+        public async Task<UpdatePaymentStatusResponseDTO> UpdatePaymentStatusAsync(UpdatePaymentStatusDTO statusUpdate)
+        {
+            //Creating an object of UpdatePaymentStatusResponseDTO class to hold the response.
+            UpdatePaymentStatusResponseDTO updatePaymentStatusResponseDTO = new UpdatePaymentStatusResponseDTO();
+
+            //Try block to execute the code and catch the exceptions if any.
+            try
+            {
+                //Creating a connection object using the CreateConnection method of SqlConnectionFactory class.
+                using var connection = _connectionFactory.CreateConnection();
+
+                //Creating a command object to execute the stored procedure.
+                using var command = new SqlCommand("spUpdatePaymentStatus", connection);
+
+                //Setting the command type to stored procedure.
+                command.CommandType = CommandType.StoredProcedure;
+
+                //Setting up the parameters for the stored procedure.
+                command.Parameters.AddWithValue("@PaymentID", statusUpdate.PaymentID);
+                command.Parameters.AddWithValue("@NewStatus", statusUpdate.NewStatus);
+
+                //Check if the FailureReason is null or empty, if not add it as a parameter else add it as DBNull which is equivalent to NULL in SQL.
+                command.Parameters.AddWithValue("@FailureReason", string.IsNullOrEmpty(statusUpdate.FailureReason) ? DBNull.Value : (object)statusUpdate.FailureReason);
+
+                //Adding the output parameters to the stored procedure.
+                command.Parameters.Add("@Status", SqlDbType.Bit).Direction = ParameterDirection.Output;
+                command.Parameters.Add("@Message", SqlDbType.NVarChar, 255).Direction = ParameterDirection.Output;
+
+                //Opening the connection.
+                await connection.OpenAsync();
+
+                //Executing the command and storing the result in a reader object.
+                await command.ExecuteNonQueryAsync();
+
+                //Setting the output parameters to the UpdatePaymentStatusResponseDTO object.
+                updatePaymentStatusResponseDTO.Status = (bool)command.Parameters["@Status"].Value;
+                updatePaymentStatusResponseDTO.Message = command.Parameters["@Message"].Value.ToString();
+            }
+            //Catch block to catch the exceptions if any.
+            catch (Exception ex)
+            {
+                //Setting the status to false and the message to the exception message.
+                updatePaymentStatusResponseDTO.Message = ex.Message;
+                updatePaymentStatusResponseDTO.Status = false;
+            }
+            //Returning the UpdatePaymentStatusResponseDTO object.
+            return updatePaymentStatusResponseDTO;
+        }
     }
 }
+
