@@ -11,7 +11,7 @@ namespace HotelBookingAPI.DTOs.PaymentDTOs
         //Status of the payment. It can be 'Completed' or 'Failed'
         [Required]
         [RegularExpression("(Completed|Failed)", ErrorMessage = "Status must be one of these : Completed or Failed.")]
-        public string NewStatus { get; set; } // 'Completed' or 'Failed'
+        public string NewStatus { get; set; }
 
         //Reason for failure if the payment status is 'Failed'
         public string FailureReason { get; set; }

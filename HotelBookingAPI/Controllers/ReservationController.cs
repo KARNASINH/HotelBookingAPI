@@ -182,6 +182,7 @@ namespace HotelBookingAPI.Controllers
 
 
 
+
         //API Endpoint to Process the Payment.
         [HttpPost("ProcessPayment")]
         public async Task<APIResponse<ProcessPaymentResponseDTO>> ProcessPayment([FromBody] ProcessPaymentDTO payment)
@@ -221,6 +222,54 @@ namespace HotelBookingAPI.Controllers
 
                 //Return 500 Http status code with the error message.
                 return new APIResponse<ProcessPaymentResponseDTO>(HttpStatusCode.InternalServerError, "Failed to Process Payment", ex.Message);
+            }
+        }
+
+
+
+
+
+
+
+        //API Endpoint to Update the Payment Status.
+        [HttpPost("UpdatePaymentStatus")]
+        public async Task<APIResponse<UpdatePaymentStatusResponseDTO>> UpdatePaymentStatus([FromBody] UpdatePaymentStatusDTO statusUpdate)
+        {
+            //Log the Request Received for UpdatePaymentStatus along with the Request Body.
+            _logger.LogInformation("Request Received for UpdatePaymentStatus: {@UpdatePaymentStatusDTO}", statusUpdate);
+
+            //Check if the Request Body is not valid.
+            if (!ModelState.IsValid)
+            {
+                //Log the Invalid Data in the Request Body.
+                _logger.LogInformation("Invalid Data in the Request Body");
+
+                //Return 400 Http status code with the error message.
+                return new APIResponse<UpdatePaymentStatusResponseDTO>(HttpStatusCode.BadRequest, "Invalid Data in the Request Body");
+            }
+            //Try to update the payment status.
+            try
+            {
+                //Call the Repository Method to Update the Payment Status.
+                var result = await _reservationRepository.UpdatePaymentStatusAsync(statusUpdate);
+
+                //Check if the Payment Status is updated successfully.
+                if (result.Status)
+                {
+                    //Return 200 Http status code with the Success Response and the Payment Details.
+                    return new APIResponse<UpdatePaymentStatusResponseDTO>(result, result.Message);
+                }
+                //Return 400 Http status code with the error message.
+                return new APIResponse<UpdatePaymentStatusResponseDTO>(HttpStatusCode.BadRequest, result.Message);
+            }
+            //Catch the Exception if any error occurred while updating the Payment Status.
+            catch (Exception ex)
+            {
+                //Log the Error Message.
+                _logger.LogError(ex, "Failed to update payment status");
+
+                //Return 500 Http status code with the error message.
+                return new APIResponse<UpdatePaymentStatusResponseDTO>(HttpStatusCode.InternalServerError, "Failed to update payment status", ex.Message);
             }
         }
     }
