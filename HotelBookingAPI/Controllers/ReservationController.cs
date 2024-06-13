@@ -1,4 +1,5 @@
 ﻿using HotelBookingAPI.DTOs.BookingDTOs;
+using HotelBookingAPI.DTOs.PaymentDTOs;
 using HotelBookingAPI.Models;
 using HotelBookingAPI.Repository;
 using Microsoft.AspNetCore.Mvc;
@@ -173,6 +174,53 @@ namespace HotelBookingAPI.Controllers
 
                 //Return 500 Http status code with the error message.
                 return new APIResponse<AddGuestsToReservationResponseDTO>(HttpStatusCode.InternalServerError, "Failed to add guests to reservation", ex.Message);
+            }
+        }
+
+
+
+
+
+
+        //API Endpoint to Process the Payment.
+        [HttpPost("ProcessPayment")]
+        public async Task<APIResponse<ProcessPaymentResponseDTO>> ProcessPayment([FromBody] ProcessPaymentDTO payment)
+        {
+            //Log the Request Received for ProcessPayment along with the Request Body.
+            _logger.LogInformation("Request Received for ProcessPayment: {@ProcessPaymentDTO}", payment);
+
+            //Check if the Request Body is not valid.
+            if (!ModelState.IsValid)
+            {
+                //Log the Invalid Data in the Request Body.
+                _logger.LogInformation("Invalid Data in the Request Body");
+
+                //Return 400 Http status code with the error message.
+                return new APIResponse<ProcessPaymentResponseDTO>(HttpStatusCode.BadRequest, "Invalid Data in the Request Body");
+            }
+            //Try to process the payment.
+            try
+            {
+                //Call the Repository Method to Process the Payment.
+                var result = await _reservationRepository.ProcessPaymentAsync(payment);
+
+                //Check if the Payment is processed successfully.
+                if (result.Status)
+                {
+                    //Return 200 Http status code with the Success Response and the Payment Details.
+                    return new APIResponse<ProcessPaymentResponseDTO>(result, result.Message);
+                }
+                //Return 400 Http status code with the error message.
+                return new APIResponse<ProcessPaymentResponseDTO>(HttpStatusCode.BadRequest, result.Message);
+            }
+            //Catch the Exception if any error occurred while processing the Payment.
+            catch (Exception ex)
+            {
+                //Log the Error Message.
+                _logger.LogError(ex, "Failed to Process Payment");
+
+                //Return 500 Http status code with the error message.
+                return new APIResponse<ProcessPaymentResponseDTO>(HttpStatusCode.InternalServerError, "Failed to Process Payment", ex.Message);
             }
         }
     }
