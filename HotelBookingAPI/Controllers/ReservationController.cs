@@ -83,6 +83,47 @@ namespace HotelBookingAPI.Controllers
 
 
 
-        
+        //API Endpoint to Create a Reservation.
+        [HttpPost("CreateReservation")]
+        public async Task<APIResponse<CreateReservationResponseDTO>> CreateReservation([FromBody] CreateReservationDTO reservation)
+        {
+            //Log the Request Received for CreateReservation along with the Request Body.
+            _logger.LogInformation("Request Received for CreateReservation: {@CreateReservationDTO}", reservation);
+
+            //Check if the Request Body is not valid.
+            if (!ModelState.IsValid)
+            {
+                //Log the Invalid Data in the Request Body.
+                _logger.LogInformation("Invalid Data in the Request Body");
+
+                //Return 400 Http status code with the error message.
+                return new APIResponse<CreateReservationResponseDTO>(HttpStatusCode.BadRequest, "Invalid Data in the Request Body.");
+            }
+
+            //Try to create a reservation.
+            try
+            {
+                //Call the Repository Method to Create a Reservation.
+                var result = await _reservationRepository.CreateReservationAsync(reservation);
+
+                //Check if the Reservation is created successfully.
+                if (result.Status)
+                {
+                    //Return the Success Response with the Reservation Details.
+                    return new APIResponse<CreateReservationResponseDTO>(result, result.Message);
+                }
+                //Return 400 Http status code with the error message.
+                return new APIResponse<CreateReservationResponseDTO>(HttpStatusCode.BadRequest, result.Message);
+            }
+            //Catch the Exception if any error occurred while creating the Reservation.
+            catch (Exception ex)
+            {
+                //Log the Error Message.
+                _logger.LogError(ex, "Failed to create reservation");
+
+                //Return 500 Http status code with the error message.
+                return new APIResponse<CreateReservationResponseDTO>(HttpStatusCode.InternalServerError, "Failed to create reservation", ex.Message);
+            }
+        }
     }
 }
