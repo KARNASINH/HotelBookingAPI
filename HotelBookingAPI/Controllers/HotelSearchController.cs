@@ -53,7 +53,7 @@ namespace HotelBookingAPI.Controllers
                     //Log the error message.
                     _logger.LogInformation("Invalid Data in the Request Body");
 
-                    //Return the response with the error message.
+                    //Return the  Bad Request response with the error message.
                     return new APIResponse<List<RoomSearchDTO>>(HttpStatusCode.BadRequest, "Invalid Data in the Request Body");
                 }
 
