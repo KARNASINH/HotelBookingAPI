@@ -125,5 +125,55 @@ namespace HotelBookingAPI.Controllers
                 return new APIResponse<CreateReservationResponseDTO>(HttpStatusCode.InternalServerError, "Failed to create reservation", ex.Message);
             }
         }
+
+
+
+
+
+
+
+
+        //API Endpoint to add the Guests  the Reservation.
+        [HttpPost("AddGuestsToReservation")]
+        public async Task<APIResponse<AddGuestsToReservationResponseDTO>> AddGuestsToReservation([FromBody] AddGuestsToReservationDTO details)
+        {
+            //Log the Request Received for AddGuestsToReservation along with the Request Body.
+            _logger.LogInformation("Request Received for AddGuestsToReservation: {@AddGuestsToReservationDTO}", details);
+
+            //Check if the Request Body is not valid.
+            if (!ModelState.IsValid)
+            {
+                //Log the Invalid Data in the Request Body.
+                _logger.LogInformation("Invalid Data in the Request Body");
+
+                //Return 400 Http status code with the error message.
+                return new APIResponse<AddGuestsToReservationResponseDTO>(HttpStatusCode.BadRequest, "Invalid Data in the Request Body");
+            }
+            //Try to add guests to the reservation.
+            try
+            {
+                //Call the Repository Method to Add Guests to the Reservation.
+                var result = await _reservationRepository.AddGuestsToReservationAsync(details);
+
+                //Check if the Guests are added to the Reservation successfully.
+                if (result.Status)
+                {
+                    //Return 200 Http status code with the Success Response and the Reservation Details.
+                    return new APIResponse<AddGuestsToReservationResponseDTO>(result, result.Message);
+                }
+
+                //Return 400 Http status code with the error message.
+                return new APIResponse<AddGuestsToReservationResponseDTO>(HttpStatusCode.BadRequest, result.Message);
+            }
+            //Catch the Exception if any error occurred while adding the Guests to the Reservation.
+            catch (Exception ex)
+            {
+                //Log the Error Message.
+                _logger.LogError(ex, "Failed to add guests to reservation");
+
+                //Return 500 Http status code with the error message.
+                return new APIResponse<AddGuestsToReservationResponseDTO>(HttpStatusCode.InternalServerError, "Failed to add guests to reservation", ex.Message);
+            }
+        }
     }
 }
