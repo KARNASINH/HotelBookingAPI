@@ -4,7 +4,8 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+//Add JsonOptions to remove the camel case property naming policy.
+//This is done to keep the property names in the response as it is defined in the model classes.
 builder.Services.AddControllers().AddJsonOptions(
         options => options.JsonSerializerOptions.PropertyNamingPolicy = null
     );
