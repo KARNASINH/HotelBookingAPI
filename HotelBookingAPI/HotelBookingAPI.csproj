@@ -12,10 +12,12 @@
     <None Remove="StoredProcedures\02_Create UserRoles Table.sql" />
     <None Remove="StoredProcedures\03_Create Users Table.sql" />
     <None Remove="StoredProcedures\04_Create Countries Table.sql" />
+    <None Remove="StoredProcedures\05_Create States Table.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="StoredProcedures\03_Create Users Table.sql" />
+    <Content Include="StoredProcedures\05_Create States Table.sql" />
     <Content Include="StoredProcedures\04_Create Countries Table.sql" />
     <Content Include="StoredProcedures\02_Create UserRoles Table.sql" />
     <Content Include="StoredProcedures\01_Create Database.sql" />
