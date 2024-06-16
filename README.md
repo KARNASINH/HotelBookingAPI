@@ -12,8 +12,11 @@
 
 ## Programming Language and Technologies used
  
+ - [x] REST Web API using .Net Core
  - [x] C#
- - [x] T-SQL
+ - [x] T-SQL Queries
+ - [x] ADO.Net Core
+ - [x] Stored Procedures
  - [x] Visual Studio
  - [x] SSSM and SQL Server
 
