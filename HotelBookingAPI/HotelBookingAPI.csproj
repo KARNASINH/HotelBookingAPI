@@ -31,10 +31,12 @@
     <None Remove="StoredProcedures\21_Stored Procedures for RoomType Module.sql" />
     <None Remove="StoredProcedures\22_Stored Procedures for User Module.sql" />
     <None Remove="StoredProcedures\23_Stored Procedures for Amenities Module.sql" />
+    <None Remove="StoredProcedures\24_Stored Procedures for RoomAmenities Module.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="StoredProcedures\03_Create Users Table.sql" />
+    <Content Include="StoredProcedures\24_Stored Procedures for RoomAmenities Module.sql" />
     <Content Include="StoredProcedures\23_Stored Procedures for Amenities Module.sql" />
     <Content Include="StoredProcedures\22_Stored Procedures for User Module.sql" />
     <Content Include="StoredProcedures\21_Stored Procedures for RoomType Module.sql" />
