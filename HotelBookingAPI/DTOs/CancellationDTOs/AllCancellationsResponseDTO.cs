@@ -1,6 +1,6 @@
 ﻿namespace HotelBookingAPI.DTOs.CancellationDTOs
 {
-    //This class is used to hold the response for fetching all Cancellation information.
+    //This class is used to hold the all Cancellation information.
     public class AllCancellationsResponseDTO
     {
         public bool Status { get; set; }
@@ -8,7 +8,7 @@
         public List<CancellationRequestDTO> Cancellations { get; set; }
     }
 
-    //This class holds the cancellation request details
+    //This class holds the cancellation request details.
     public class CancellationRequestDTO
     {
         public int CancellationRequestID { get; set; }
