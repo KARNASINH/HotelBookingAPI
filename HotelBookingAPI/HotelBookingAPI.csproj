@@ -39,11 +39,15 @@
     <None Remove="StoredProcedures\29_Create CancellationDetails Table.sql" />
     <None Remove="StoredProcedures\30_Create CancellationCharges Table.sql" />
     <None Remove="StoredProcedures\31_Modified Refunds Table.sql" />
+    <None Remove="StoredProcedures\32_Constraint checking.sql" />
+    <None Remove="StoredProcedures\33_Stored Procedures for Cancellation Module.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="StoredProcedures\03_Create Users Table.sql" />
     <Content Include="StoredProcedures\26_Stored Procedures for HotelBooking Module.sql" />
+    <Content Include="StoredProcedures\33_Stored Procedures for Cancellation Module.sql" />
+    <Content Include="StoredProcedures\32_Constraint checking.sql" />
     <Content Include="StoredProcedures\31_Modified Refunds Table.sql" />
     <Content Include="StoredProcedures\30_Create CancellationCharges Table.sql" />
     <Content Include="StoredProcedures\29_Create CancellationDetails Table.sql" />
