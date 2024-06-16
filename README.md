@@ -20,5 +20,5 @@
  ## Screenshots
 
  Database Tables Diagram
-
  
+ ![Diagram](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/0029f4b6-6c8b-4b54-ba45-22aaf5de27af)
