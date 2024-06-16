@@ -593,3 +593,71 @@ END;
 GO
 
 
+-- Stored Procedure for Updating the Payment Status
+CREATE OR ALTER PROCEDURE spUpdatePaymentStatus
+@PaymentID INT,
+@NewStatus NVARCHAR(50), -- 'Completed' or 'Failed'
+@FailureReason NVARCHAR(255) = NULL, -- Optional reason for failure
+@Status BIT OUTPUT, -- Output to indicate success/failure of the procedure
+@Message NVARCHAR(255) OUTPUT -- Output message detailing the result
+AS
+BEGIN
+SET NOCOUNT ON;
+SET XACT_ABORT ON; -- Ensure that if an error occurs, all changes are rolled back
+BEGIN TRY
+BEGIN TRANSACTION
+-- Check if the payment exists and is in a 'Pending' status
+DECLARE @CurrentStatus NVARCHAR(50);
+SELECT @CurrentStatus = PaymentStatus FROM Payments WHERE PaymentID = @PaymentID;
+IF @CurrentStatus IS NULL
+BEGIN
+SET @Status = 0; -- Failure
+SET @Message = 'Payment record does not exist.';
+RETURN;
+END
+IF @CurrentStatus <> 'Pending'
+BEGIN
+SET @Status = 0; -- Failure
+SET @Message = 'Payment status is not Pending. Cannot update.';
+RETURN;
+END
+-- Validate the new status
+IF @NewStatus NOT IN ('Completed', 'Failed')
+BEGIN
+SET @Status = 0; -- Failure
+SET @Message = 'Invalid status value. Only "Completed" or "Failed" are acceptable.';
+RETURN;
+END
+-- Update the Payment Status
+UPDATE Payments
+SET PaymentStatus = @NewStatus,
+FailureReason = CASE WHEN @NewStatus = 'Failed' THEN @FailureReason ELSE NULL END
+WHERE PaymentID = @PaymentID;
+-- If Payment Fails, update corresponding reservation and room statuses
+IF @NewStatus = 'Failed'
+BEGIN
+DECLARE @ReservationID INT;
+SELECT @ReservationID = ReservationID FROM Payments WHERE PaymentID = @PaymentID;
+-- Update Reservation Status
+UPDATE Reservations
+SET Status = 'Cancelled'
+WHERE ReservationID = @ReservationID;
+-- Update Room Status
+UPDATE Rooms
+SET Status = 'Available'
+FROM Rooms
+JOIN ReservationRooms ON Rooms.RoomID = ReservationRooms.RoomID
+WHERE ReservationRooms.ReservationID = @ReservationID;
+END
+SET @Status = 1; -- Success
+SET @Message = 'Payment Status Updated Successfully.';
+COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+IF @@TRANCOUNT > 0
+ROLLBACK TRANSACTION;
+SET @Status = 0; -- Failure
+SET @Message = ERROR_MESSAGE();
+END CATCH
+END;
+GO
