@@ -10,6 +10,13 @@
  2. Booking module which includes Searching and Payment operations.
  3. Cancellation module to cancel the booking.
 
+## Programming Language and Technologies used
+ 
+ - [x] C#
+ - [x] T-SQL
+ - [x] Visual Studio
+ - [x] SSSM and SQL Server
+
 ## MS SQL Database Tables
 
 1. User
@@ -34,13 +41,6 @@
 20. CancellationDetails
 21. Refunds
 22. RefundMethods
-
-## Programming Language and Technologies used
- 
- - [x] C#
- - [x] T-SQL
- - [x] Visual Studio
- - [x] SSSM and SQL Server
 
  ## Screenshots
 
