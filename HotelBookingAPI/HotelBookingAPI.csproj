@@ -20,10 +20,12 @@
     <None Remove="StoredProcedures\10_Create Guest Table.sql" />
     <None Remove="StoredProcedures\11_Create Reservations Table.sql" />
     <None Remove="StoredProcedures\12_Create ReservationGuests Table.sql" />
+    <None Remove="StoredProcedures\13_Create PaymentBatches Table.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="StoredProcedures\03_Create Users Table.sql" />
+    <Content Include="StoredProcedures\13_Create PaymentBatches Table.sql" />
     <Content Include="StoredProcedures\12_Create ReservationGuests Table.sql" />
     <Content Include="StoredProcedures\11_Create Reservations Table.sql" />
     <Content Include="StoredProcedures\10_Create Guest Table.sql" />
