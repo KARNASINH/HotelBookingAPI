@@ -1,0 +1,23 @@
+-- This script creates the Users table
+
+CREATE TABLE Users 
+(
+
+UserID INT PRIMARY KEY IDENTITY(1,1),
+RoleID INT,
+Email NVARCHAR(100) UNIQUE,
+PasswordHash NVARCHAR(255),
+CreatedAt DATETIME DEFAULT GETDATE(),
+LastLogin DATETIME,
+IsActive BIT DEFAULT 1,
+CreatedBy NVARCHAR(100),
+CreatedDate DATETIME DEFAULT GETDATE(),
+ModifiedBy NVARCHAR(100),
+ModifiedDate DATETIME,
+
+-- FOREIGN KEY CONSTRAINT
+FOREIGN KEY (RoleID) REFERENCES UserRoles(RoleID)
+
+);
+
+GO
