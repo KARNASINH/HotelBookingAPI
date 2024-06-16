@@ -26,10 +26,12 @@
     <None Remove="StoredProcedures\16_Create RefundMethods Table.sql" />
     <None Remove="StoredProcedures\17_Create Refunds Table.sql" />
     <None Remove="StoredProcedures\18_Create Feedbacks Table.sql" />
+    <None Remove="StoredProcedures\19_Insert Dummy data into Database Tables.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="StoredProcedures\03_Create Users Table.sql" />
+    <Content Include="StoredProcedures\19_Insert Dummy data into Database Tables.sql" />
     <Content Include="StoredProcedures\18_Create Feedbacks Table.sql" />
     <Content Include="StoredProcedures\17_Create Refunds Table.sql" />
     <Content Include="StoredProcedures\16_Create RefundMethods Table.sql" />
