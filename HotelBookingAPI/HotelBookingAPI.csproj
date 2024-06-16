@@ -15,10 +15,12 @@
     <None Remove="StoredProcedures\05_Create States Table.sql" />
     <None Remove="StoredProcedures\06_Create RoomTypes Table.sql" />
     <None Remove="StoredProcedures\07_Create Rooms Table.sql" />
+    <None Remove="StoredProcedures\08_Create Amenities Table.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="StoredProcedures\03_Create Users Table.sql" />
+    <Content Include="StoredProcedures\08_Create Amenities Table.sql" />
     <Content Include="StoredProcedures\07_Create Rooms Table.sql" />
     <Content Include="StoredProcedures\06_Create RoomTypes Table.sql" />
     <Content Include="StoredProcedures\05_Create States Table.sql" />
