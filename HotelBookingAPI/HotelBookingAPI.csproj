@@ -27,16 +27,18 @@
     <None Remove="StoredProcedures\17_Create Refunds Table.sql" />
     <None Remove="StoredProcedures\18_Create Feedbacks Table.sql" />
     <None Remove="StoredProcedures\19_Insert Dummy data into Database Tables.sql" />
-    <None Remove="StoredProcedures\20_Stored Procedure for User Module.sql" />
-    <None Remove="StoredProcedures\21_Stored Procedure for RoomType Module.sql" />
-    <None Remove="StoredProcedures\22_Stored Procedure for User Module.sql" />
+    <None Remove="StoredProcedures\20_Stored Procedures for User Module.sql" />
+    <None Remove="StoredProcedures\21_Stored Procedures for RoomType Module.sql" />
+    <None Remove="StoredProcedures\22_Stored Procedures for User Module.sql" />
+    <None Remove="StoredProcedures\23_Stored Procedures for Amenities Module.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="StoredProcedures\03_Create Users Table.sql" />
-    <Content Include="StoredProcedures\22_Stored Procedure for User Module.sql" />
-    <Content Include="StoredProcedures\21_Stored Procedure for RoomType Module.sql" />
-    <Content Include="StoredProcedures\20_Stored Procedure for User Module.sql" />
+    <Content Include="StoredProcedures\23_Stored Procedures for Amenities Module.sql" />
+    <Content Include="StoredProcedures\22_Stored Procedures for User Module.sql" />
+    <Content Include="StoredProcedures\21_Stored Procedures for RoomType Module.sql" />
+    <Content Include="StoredProcedures\20_Stored Procedures for User Module.sql" />
     <Content Include="StoredProcedures\19_Insert Dummy data into Database Tables.sql" />
     <Content Include="StoredProcedures\18_Create Feedbacks Table.sql" />
     <Content Include="StoredProcedures\17_Create Refunds Table.sql" />
