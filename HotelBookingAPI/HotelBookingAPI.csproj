@@ -8,11 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="StoredProcedures\spAddAmenity.sql" />
+    <None Remove="StoredProcedures\01_CreateDatabase.sql" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="StoredProcedures\spAddAmenity.sql" />
+    <Content Include="StoredProcedures\01_CreateDatabase.sql" />
   </ItemGroup>
 
   <ItemGroup>
