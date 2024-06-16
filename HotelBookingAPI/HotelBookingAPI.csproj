@@ -9,13 +9,15 @@
 
   <ItemGroup>
     <None Remove="StoredProcedures\01_Create Database.sql" />
-    <None Remove="StoredProcedures\02_Create UserRoles.sql" />
-    <None Remove="StoredProcedures\03_Create Users.sql" />
+    <None Remove="StoredProcedures\02_Create UserRoles Table.sql" />
+    <None Remove="StoredProcedures\03_Create Users Table.sql" />
+    <None Remove="StoredProcedures\04_Create Countries Table.sql" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="StoredProcedures\03_Create Users.sql" />
-    <Content Include="StoredProcedures\02_Create UserRoles.sql" />
+    <Content Include="StoredProcedures\03_Create Users Table.sql" />
+    <Content Include="StoredProcedures\04_Create Countries Table.sql" />
+    <Content Include="StoredProcedures\02_Create UserRoles Table.sql" />
     <Content Include="StoredProcedures\01_Create Database.sql" />
   </ItemGroup>
 
