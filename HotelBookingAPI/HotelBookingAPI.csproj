@@ -35,11 +35,13 @@
     <None Remove="StoredProcedures\25_Stored Procedures for Search Module.sql" />
     <None Remove="StoredProcedures\26_Stored Procedures for HotelBooking Module.sql" />
     <None Remove="StoredProcedures\27_Create CancellationRequests Table.sql" />
+    <None Remove="StoredProcedures\28_Create CancellationPolicies Table.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="StoredProcedures\03_Create Users Table.sql" />
     <Content Include="StoredProcedures\26_Stored Procedures for HotelBooking Module.sql" />
+    <Content Include="StoredProcedures\28_Create CancellationPolicies Table.sql" />
     <Content Include="StoredProcedures\27_Create CancellationRequests Table.sql" />
     <Content Include="StoredProcedures\25_Stored Procedures for Search Module.sql" />
     <Content Include="StoredProcedures\24_Stored Procedures for RoomAmenities Module.sql" />
