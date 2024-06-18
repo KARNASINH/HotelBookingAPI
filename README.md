@@ -57,8 +57,30 @@
 
 ![d9](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/329836a6-f629-404c-bead-8d6a0f36a756)
 
+## WEB APIs End Points for CRUD and various operations
 
-## Screenshots
+![w1](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/c247acf2-b6b0-49e4-8a5d-a5539f7b641b)
+
+
+![w2](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/09b0f412-9ef0-46d8-84ec-89737bbcf9ac)
+
+
+![w3](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/7584332f-7d39-4e9c-8a7c-e4f95c4ed968)
+
+
+![w4](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/6aeaec56-c165-433f-9b6f-4e3205cf8817)
+
+
+![w5](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/0e820983-58b2-4928-b6ff-9595bbfd57bb)
+
+
+![w6](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/35185972-c83f-4990-8b15-2c6935e6ea8c)
+
+
+![w7](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/82a72ad0-8e30-48fb-8c73-9bc171f97f8b)
+
+
+## MS-SQL Database Tables Relationship
 
 Users, UserRoles, Guests, Countries and States tables connectivity.
 
