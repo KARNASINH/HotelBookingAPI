@@ -20,6 +20,14 @@
  - [x] Visual Studio
  - [x] SSSM and SQL Server
 
+## Nuget Packages used
+ 
+ - [x] Microsoft.Data.SqlClient (5.2.0)
+ - [x] Serilog.AspNetCore (8.0.1)
+ - [x] Serilog.Settings.Configuration (8.0.0)
+ - [x] Serilog.Sinks.File (5.0.0)
+ - [x] Swashbuckle.AspNetCore (6.4.0)
+
 ## MS SQL Database Tables
 
 1. User
@@ -45,35 +53,57 @@
 21. Refunds
 22. RefundMethods
 
- ## Screenshots
+## Project folders Structure
 
- Users, UserRoles, Guests, Countries and States tables connectivity.
-
- ![d1](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/7f3beca9-6825-4112-9e66-46d464e4d151)
+![d9](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/329836a6-f629-404c-bead-8d6a0f36a756)
 
 
- Rooms, RoomTypes, Amenities and RoomAmenities tables connectivity.
+## Screenshots
 
- ![d2](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/0a4e24a5-b346-4f24-b1c9-72dc6a806025)
+Users, UserRoles, Guests, Countries and States tables connectivity.
 
-
- Reservations, ReservationRooms and ReservationGuests tables connectiity.
-
- ![d3](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/e7b44fb0-60fa-424e-93a9-d83cb13e2623)
+![d1](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/7f3beca9-6825-4112-9e66-46d464e4d151)
 
 
- Payments and PaymentDetails tables connectiity.
+Rooms, RoomTypes, Amenities and RoomAmenities tables connectivity.
 
- ![d5](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/80ff2b24-707e-443f-b89b-eaef7a91f822)
-
-
- CancellationRequests, Cancellations, CancellationPolicies, CancellationCharges and CancellationDetails tables connectiity.
-
- ![d7](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/a3e8d63a-bafb-460f-be15-b429e2b09488)
+![d2](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/0a4e24a5-b346-4f24-b1c9-72dc6a806025)
 
 
- Refund, RefudnMethods and Feedbacks tables connectiity.
+Reservations, ReservationRooms and ReservationGuests tables connectiity.
+
+![d3](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/e7b44fb0-60fa-424e-93a9-d83cb13e2623)
+
+
+Payments and PaymentDetails tables connectiity.
+
+![d5](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/80ff2b24-707e-443f-b89b-eaef7a91f822)
+
+
+CancellationRequests, Cancellations, CancellationPolicies, CancellationCharges and CancellationDetails tables connectiity.
+
+![d7](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/a3e8d63a-bafb-460f-be15-b429e2b09488)
+
+
+Refund, RefudnMethods and Feedbacks tables connectiity.
  
- ![d8](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/c7fff849-835e-40e1-b7ac-cb874f769de6)
+![d8](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/c7fff849-835e-40e1-b7ac-cb874f769de6)
+
+
+## Database Tables (SQL Server)
+
+![d10](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/6c59ceb7-e470-474d-af0c-40c6e982e388)
+
+
+## Database Stored Procedures (SQL Server)
+
+![d11](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/95adfca9-5c66-4f3f-82b4-65419d511284)
+
+![d12](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/af7d3127-5acb-4e8a-86e2-63238a8b0c3d)
+
+
+## Database "User Defined Type" (Data Table)
+
+![d13](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/2bf13b90-19c3-433b-a111-8fa33d5d2f25)
 
 
