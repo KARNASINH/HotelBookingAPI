@@ -57,7 +57,7 @@
 
 ![d9](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/329836a6-f629-404c-bead-8d6a0f36a756)
 
-## WEB APIs End Points for CRUD and various operations
+## WEB APIs End Points for CRUD and other operations
 
 ![w1](https://github.com/KARNASINH/HotelBookingAPI/assets/75551627/c247acf2-b6b0-49e4-8a5d-a5539f7b641b)
 
